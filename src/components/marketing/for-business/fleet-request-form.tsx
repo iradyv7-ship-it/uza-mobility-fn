@@ -16,9 +16,12 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { brand } from '@/lib/marketing/colors';
 import { VEHICLE_CATEGORY_TYPES_FOR_FLEET } from '@/lib/marketing/for-business';
+import {
+  NumberInput,
+  numberRegisterOptions,
+} from '@/components/ui/number-input';
 import { useSubmitFleetRequest } from '@/queries/fleet';
 import {
-  FLEET_SIZE_OPTIONS,
   fleetRequestSchema,
   type FleetRequestInput,
 } from '@/schemas/fleet-request';
@@ -35,7 +38,7 @@ const EMPTY_FORM_VALUES: FleetRequestInput = {
   phoneCountryCode: '+250',
   phoneNumber: '',
   vehicleCategoryId: '',
-  quantity: 5,
+  quantity: 1,
   notes: '',
 };
 
@@ -184,26 +187,18 @@ export function FleetRequestForm({ categories }: FleetRequestFormProps) {
 
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-1.5">
-              <Label>Fleet Size</Label>
-              <Select
-                value={String(form.watch('quantity'))}
-                onValueChange={(value) =>
-                  form.setValue('quantity', Number(value), {
-                    shouldValidate: true,
-                  })
-                }
-              >
-                <SelectTrigger className="h-11 w-full">
-                  <SelectValue placeholder="Select fleet size..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {FLEET_SIZE_OPTIONS.map((option) => (
-                    <SelectItem key={option.label} value={String(option.value)}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="fleet-quantity">Number of vehicles</Label>
+              <NumberInput
+                id="fleet-quantity"
+                min={1}
+                step={1}
+                placeholder="e.g. 12"
+                aria-invalid={Boolean(form.formState.errors.quantity)}
+                {...form.register('quantity', numberRegisterOptions())}
+              />
+              <p className="text-xs text-[#356769]">
+                Enter the exact number of vehicles you need.
+              </p>
               {form.formState.errors.quantity ? (
                 <p className="text-sm text-red-600">
                   {form.formState.errors.quantity.message}

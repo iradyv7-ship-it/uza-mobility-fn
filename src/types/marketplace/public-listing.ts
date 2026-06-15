@@ -67,7 +67,12 @@ export type PublicListing = {
   hasWarranty?: boolean;
   warrantyDetails?: string | null;
   ownershipCount?: number | null;
-  registrationStatus?: string | null;
+  registrationStatus?:
+    | 'REGISTERED'
+    | 'READY_FOR_REGISTRATION'
+    | 'IMPORT_PENDING'
+    | 'NOT_APPLICABLE'
+    | null;
   vehicleLocation?: string | null;
   verificationLevel?: string | null;
   videoUrl?: string | null;

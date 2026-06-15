@@ -4,7 +4,7 @@ import type {
   UpdateSellerListingInput,
 } from '@/schemas/seller';
 import type { SellerListing } from '@/types/seller/marketplace';
-import { listingChargingTypes, listingConditions } from '@/schemas/marketplace';
+import { listingConditions } from '@/schemas/marketplace';
 
 export function sellerListingToFormValues(
   listing: SellerListing,
@@ -16,7 +16,6 @@ export function sellerListingToFormValues(
         : 'LOCAL_SELLER',
     listingTitle: listing.listingTitle,
     categoryId: listing.category.id,
-    subcategoryId: listing.subcategory?.id ?? '',
     brand: listing.brand,
     model: listing.model,
     trim: listing.trim ?? '',
@@ -33,14 +32,6 @@ export function sellerListingToFormValues(
     mileageKm: listing.mileageKm ?? undefined,
     rangeKm: listing.evSpecs?.rangeKm ?? undefined,
     batteryHealthPercent: listing.evSpecs?.batteryHealthPercent ?? undefined,
-    chargingType:
-      listing.evSpecs?.chargingType &&
-      (listingChargingTypes as readonly string[]).includes(
-        listing.evSpecs.chargingType,
-      )
-        ? (listing.evSpecs
-            .chargingType as SellerListingFormInput['chargingType'])
-        : undefined,
     fobPriceUsd: listing.listingPricing?.fobPriceUsd ?? undefined,
     sellerDesiredPayoutUsd:
       listing.listingPricing?.sellerDesiredPayoutUsd ?? undefined,
@@ -53,7 +44,6 @@ export function toSellerListingBody(
   const {
     sellerDesiredPayoutUsd,
     fobPriceUsd,
-    subcategoryId,
     description,
     trim,
     mileageKm,
@@ -63,13 +53,11 @@ export function toSellerListingBody(
   return {
     ...rest,
     isNew: input.condition === 'NEW',
-    subcategoryId: subcategoryId?.trim() || undefined,
     description: description?.trim() || undefined,
     trim: trim?.trim() || undefined,
     mileageKm,
     evSpecs: {
       rangeKm: input.rangeKm!,
-      chargingType: input.chargingType!,
       batteryHealthPercent:
         input.condition === 'NEW' ? undefined : input.batteryHealthPercent,
     },

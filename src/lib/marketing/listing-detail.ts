@@ -56,6 +56,18 @@ export function formatVerificationLabel(level?: string | null): string {
   return level.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+const registrationStatusLabels: Record<string, string> = {
+  REGISTERED: 'Registered',
+  READY_FOR_REGISTRATION: 'Ready for registration',
+  IMPORT_PENDING: 'Import pending',
+  NOT_APPLICABLE: 'Not applicable',
+};
+
+export function formatRegistrationStatusLabel(status?: string | null): string {
+  if (!status) return '—';
+  return registrationStatusLabels[status] ?? status.replace(/_/g, ' ');
+}
+
 export function formatUseCases(listing: PublicListing): string {
   const tags = listing.useCaseTags?.map((t) =>
     t.useCase.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
@@ -258,7 +270,10 @@ export function buildVehicleExtendedSpecGroups(
     ),
     ...commercial,
     specRow('Warranty', formatWarranty(listing)),
-    specRow('Registration', listing.registrationStatus),
+    specRow(
+      'Registration',
+      formatRegistrationStatusLabel(listing.registrationStatus),
+    ),
     specRow(
       'Previous owners',
       listing.ownershipCount != null ? String(listing.ownershipCount) : '—',

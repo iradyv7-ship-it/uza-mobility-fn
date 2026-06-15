@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { listingChargingTypes, listingConditions } from '@/schemas/marketplace';
+import { listingConditions } from '@/schemas/marketplace';
 
 export const marketplaceListingSellerTypes = [
   'LOCAL_SELLER',
@@ -12,7 +12,6 @@ const sellerListingFormFieldsSchema = z.object({
   sellerType: z.enum(marketplaceListingSellerTypes),
   listingTitle: z.string().min(1).max(200),
   categoryId: z.string().min(1, 'Category is required'),
-  subcategoryId: z.string().optional(),
   brand: z.string().min(1).max(100),
   model: z.string().min(1).max(100),
   trim: z.string().max(100).optional(),
@@ -25,7 +24,6 @@ const sellerListingFormFieldsSchema = z.object({
   mileageKm: z.number().min(0).optional(),
   rangeKm: z.number().min(1).optional(),
   batteryHealthPercent: z.number().min(0).max(100).optional(),
-  chargingType: z.enum(listingChargingTypes).optional(),
   sellerDesiredPayoutUsd: z.number().min(0).optional(),
   fobPriceUsd: z.number().min(0).optional(),
 });
@@ -39,14 +37,6 @@ function refineSellerListingEvSpecs(
       code: 'custom',
       message: 'Electric range (km) is required',
       path: ['rangeKm'],
-    });
-  }
-
-  if (!data.chargingType) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Charging type is required',
-      path: ['chargingType'],
     });
   }
 

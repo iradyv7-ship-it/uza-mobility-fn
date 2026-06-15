@@ -1,17 +1,8 @@
-import type { Category, CategoryType } from '@/types/catalog';
-
 export const VEHICLES_PAGE_SIZE = 9;
-
-const VEHICLE_CATEGORY_TYPES: CategoryType[] = [
-  'PASSENGER_EV',
-  'TWO_THREE_WHEEL',
-];
 
 export type VehiclesSearchParams = {
   stock?: string;
   category?: string;
-  subcategory?: string;
-  subcategories?: string[];
   useCase?: string;
   q?: string;
   page?: number;
@@ -65,23 +56,8 @@ export function applyVehiclesSearchPatch(
 ): VehiclesSearchParams {
   const next = { ...base, ...patch };
   if (!('page' in patch)) next.page = 1;
-  if ('subcategories' in patch || 'subcategory' in patch) {
-    if (patch.subcategories === undefined && patch.subcategory === undefined) {
-      delete next.subcategory;
-      delete next.subcategories;
-    } else if (next.subcategories?.length === 1) {
-      next.subcategory = next.subcategories[0];
-      delete next.subcategories;
-    } else if (next.subcategories && next.subcategories.length > 1) {
-      delete next.subcategory;
-    }
-  }
   if ('brand' in patch && patch.brand !== base.brand) {
     delete next.model;
-  }
-  if ('category' in patch && patch.category !== base.category) {
-    delete next.subcategory;
-    delete next.subcategories;
   }
   return next;
 }
@@ -95,14 +71,6 @@ export function parseVehiclesSearchParams(
     return Array.isArray(v) ? v[0] : v;
   };
 
-  const subcategoriesRaw = pick('subcategories') ?? pick('subcategory');
-  const subcategories = subcategoriesRaw
-    ? subcategoriesRaw
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean)
-    : undefined;
-
   const num = (key: string) => {
     const v = pick(key);
     if (v == null || v === '') return undefined;
@@ -113,10 +81,6 @@ export function parseVehiclesSearchParams(
   return {
     stock: pick('stock'),
     category: pick('category'),
-    subcategory:
-      subcategories?.length === 1 ? subcategories[0] : pick('subcategory'),
-    subcategories:
-      subcategories && subcategories.length > 1 ? subcategories : undefined,
     useCase: pick('useCase'),
     q: pick('q'),
     page: Math.max(1, num('page') ?? 1),
@@ -136,20 +100,6 @@ export function parseVehiclesSearchParams(
     priceMin: num('priceMin'),
     priceMax: num('priceMax'),
   };
-}
-
-export function vehiclesBodyTypeOptions(categories: Category[]) {
-  return categories
-    .filter((c) => VEHICLE_CATEGORY_TYPES.includes(c.type))
-    .flatMap((c) =>
-      (c.subcategories ?? [])
-        .filter((s) => s.isActive)
-        .map((s) => ({
-          slug: s.slug,
-          label: s.name,
-          categorySlug: c.slug,
-        })),
-    );
 }
 
 export function formatConditionLabel(value: string): string {

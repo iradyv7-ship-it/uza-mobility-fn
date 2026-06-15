@@ -5,8 +5,6 @@ import type { PublicListing } from '@/types/marketplace/public-listing';
 export type BrowseListingsFilters = {
   q?: string;
   category?: string;
-  subcategory?: string;
-  subcategories?: string[];
   useCase?: string;
   limit?: number;
   page?: number;
@@ -68,11 +66,6 @@ export function browseListings(filters: BrowseListingsFilters = {}) {
   });
   if (filters.q?.trim()) params.set('q', filters.q.trim());
   if (filters.category) params.set('category', filters.category);
-  if (filters.subcategories?.length) {
-    params.set('subcategories', filters.subcategories.join(','));
-  } else if (filters.subcategory) {
-    params.set('subcategory', filters.subcategory);
-  }
   if (filters.useCase) params.set('useCase', filters.useCase);
   if (filters.sort) params.set('sort', filters.sort);
   if (filters.brand) params.set('brand', filters.brand);

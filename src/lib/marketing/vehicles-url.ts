@@ -13,11 +13,6 @@ export function vehiclesHref(filters?: VehiclesSearchParams) {
     params.set('page', String(filters.page));
   }
 
-  const subs =
-    filters?.subcategories ??
-    (filters?.subcategory ? [filters.subcategory] : undefined);
-  if (subs?.length) params.set('subcategories', subs.join(','));
-
   if (filters?.brand) params.set('brand', filters.brand);
   if (filters?.model) params.set('model', filters.model);
   if (filters?.condition) params.set('condition', filters.condition);

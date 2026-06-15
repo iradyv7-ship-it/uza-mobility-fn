@@ -1,4 +1,3 @@
-import type { VehiclesSearchParams } from '@/lib/marketing/vehicles-browse';
 import { vehiclesHref } from '@/lib/marketing/vehicles-url';
 
 export type ForBusinessIndustryCard = {
@@ -38,11 +37,9 @@ export const FOR_BUSINESS_INDUSTRY_CARDS: Omit<
 
 export function forBusinessIndustryHref(
   card: Pick<ForBusinessIndustryCard, 'categorySlug'>,
-  filters?: Pick<VehiclesSearchParams, 'subcategory'>,
 ) {
   return vehiclesHref({
     category: card.categorySlug,
-    ...filters,
   });
 }
 

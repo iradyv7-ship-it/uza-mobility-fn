@@ -59,8 +59,6 @@ export async function VehiclesPageAsync({
           limit: VEHICLES_PAGE_SIZE,
           q: filters.q,
           category: filters.category,
-          subcategory: filters.subcategory,
-          subcategories: filters.subcategories,
           useCase: filters.useCase,
           sort: filters.sort,
           brand: filters.brand,
@@ -100,7 +98,7 @@ export async function VehiclesPageAsync({
         <div className={`${marketingContainer} py-10 sm:py-14 lg:py-[60px]`}>
           {!isLocalStock ? <VehiclesBrowseToolbar filters={filters} /> : null}
 
-          <div className="flex flex-col gap-8 lg:flex-row lg:gap-8">
+          <div className="flex flex-col gap-8 max-lg:flex-col-reverse lg:flex-row lg:items-start lg:gap-8">
             {!isLocalStock ? (
               <VehiclesFiltersSidebar
                 filters={filters}

@@ -24,7 +24,6 @@ export type SellerListingEvSpecs = {
 
 export type SellerListingPricing = {
   finalPriceUsd: number;
-  finalPriceRwf: number | null;
   currency: string;
   basePriceUsd?: number | null;
   fobPriceUsd?: number | null;

@@ -47,8 +47,6 @@ import {
 } from '@/queries/seller';
 import {
   createSellerListingSchema,
-  formatListingChargingType,
-  listingChargingTypes,
   listingConditions,
   MAX_SELLER_LISTING_PHOTOS,
   sellerListingFormSchema,
@@ -107,7 +105,6 @@ export function SellerListingFormDialog({
       sellerType: defaultSellerType,
       listingTitle: '',
       categoryId: '',
-      subcategoryId: '',
       brand: '',
       model: '',
       trim: '',
@@ -155,9 +152,6 @@ export function SellerListingFormDialog({
           debouncedFob != null &&
           debouncedFob > 0)),
   });
-  const selectedCategory = vehicleCats.find((c) => c.id === categoryId);
-  const subcategories = selectedCategory?.subcategories ?? [];
-
   useEffect(() => {
     if (!open) return;
     setPhotos((current) => {
@@ -171,7 +165,6 @@ export function SellerListingFormDialog({
         sellerType: defaultSellerType,
         listingTitle: '',
         categoryId: '',
-        subcategoryId: '',
         brand: '',
         model: '',
         trim: '',
@@ -273,50 +266,25 @@ export function SellerListingFormDialog({
             <Input id="listing-title" {...form.register('listingTitle')} />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label>Category</Label>
-              <Select
-                value={categoryId}
-                onValueChange={(value) => {
-                  form.setValue('categoryId', value);
-                  form.setValue('subcategoryId', '');
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {vehicleCats.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Subcategory</Label>
-              <Select
-                value={form.watch('subcategoryId') ?? ''}
-                onValueChange={(value) =>
-                  form.setValue('subcategoryId', value === 'none' ? '' : value)
-                }
-                disabled={subcategories.length === 0}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Optional" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  {subcategories.map((sub) => (
-                    <SelectItem key={sub.id} value={sub.id}>
-                      {sub.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-1.5">
+            <Label>Category</Label>
+            <Select
+              value={categoryId}
+              onValueChange={(value) => {
+                form.setValue('categoryId', value);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {vehicleCats.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
@@ -380,35 +348,6 @@ export function SellerListingFormDialog({
                 min={1}
                 {...form.register('rangeKm', numberRegisterOptions())}
               />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Charging type</Label>
-              <Select
-                value={form.watch('chargingType') ?? ''}
-                onValueChange={(value) =>
-                  form.setValue(
-                    'chargingType',
-                    value as SellerListingFormInput['chargingType'],
-                    { shouldValidate: true },
-                  )
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select charging type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {listingChargingTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {formatListingChargingType(type)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.formState.errors.chargingType ? (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.chargingType.message}
-                </p>
-              ) : null}
             </div>
           </div>
 

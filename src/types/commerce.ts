@@ -101,7 +101,6 @@ export type AdminInvoice = {
   vehicleModel: string | null;
   listingTitle?: string | null;
   totalAmountUsd: number;
-  totalAmountRwf: number | null;
   currency: string;
   paymentDeadline: string | null;
   validUntil: string | null;

@@ -18,8 +18,8 @@ export function VehiclesPageContentSkeleton() {
           <Skeleton className="h-11 flex-1 rounded-lg" />
           <Skeleton className="h-11 w-full max-w-[208px] rounded-lg" />
         </div>
-        <div className="flex flex-col gap-8 lg:flex-row lg:gap-8">
-          <Skeleton className="hidden h-[520px] w-full shrink-0 rounded-lg lg:block lg:w-72" />
+        <div className="flex flex-col gap-8 max-lg:flex-col-reverse lg:flex-row lg:items-start lg:gap-8">
+          <Skeleton className="h-64 w-full shrink-0 self-start rounded-lg lg:h-auto lg:w-72" />
           <div className="min-w-0 flex-1">
             <ListingGridSkeleton
               count={9}

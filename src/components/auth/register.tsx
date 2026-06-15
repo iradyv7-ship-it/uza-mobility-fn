@@ -11,6 +11,7 @@ import { AuthFormMessage } from '@/components/auth/auth-form-message';
 import { AuthPageHeader } from '@/components/auth/auth-page-header';
 import { AuthPasswordInput } from '@/components/auth/auth-password-input';
 import { AuthPrimaryButton } from '@/components/auth/auth-primary-button';
+import { GoogleSignInButton } from '@/components/auth/google-sign-in-button';
 import {
   authAccentLinkClassName,
   authFieldClassName,
@@ -196,14 +197,21 @@ export function Register() {
             </div>
           ) : null}
 
-          <AuthPrimaryButton
-            type="submit"
-            disabled={registerMutation.isPending}
-          >
-            {registerMutation.isPending
-              ? 'Creating account…'
-              : 'Create account'}
-          </AuthPrimaryButton>
+          <div className="space-y-2">
+            <AuthPrimaryButton
+              type="submit"
+              disabled={registerMutation.isPending}
+            >
+              {registerMutation.isPending
+                ? 'Creating account…'
+                : 'Create account'}
+            </AuthPrimaryButton>
+            <GoogleSignInButton
+              disabled={registerMutation.isPending}
+              returnTo={callbackUrl.startsWith('/') ? callbackUrl : undefined}
+              onError={(message) => form.setError('root', { message })}
+            />
+          </div>
         </form>
 
         <p className={authFooterLinkClassName}>
