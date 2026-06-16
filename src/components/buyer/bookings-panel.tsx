@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { BuyerBookingDetailSheet } from '@/components/buyer/booking-detail-sheet';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
@@ -36,6 +37,10 @@ export function BuyerBookingsPanel() {
     null,
   );
   const [cancelTarget, setCancelTarget] = useState<VehicleBooking | null>(null);
+  const [detailBooking, setDetailBooking] = useState<VehicleBooking | null>(
+    null,
+  );
+  const [detailOpen, setDetailOpen] = useState(false);
 
   useEffect(() => {
     if (!highlightId || !data?.items.length) return;
@@ -136,6 +141,18 @@ export function BuyerBookingsPanel() {
                   <StatusBadge status={booking.status} />
                 )}
 
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    setDetailBooking(booking);
+                    setDetailOpen(true);
+                  }}
+                >
+                  Details
+                </Button>
+
                 {isBookingPaymentSubmittable(booking) ? (
                   <>
                     <Button
@@ -177,6 +194,12 @@ export function BuyerBookingsPanel() {
       <Button asChild variant="outline">
         <Link href={workspaceRoutes.account}>Back to overview</Link>
       </Button>
+
+      <BuyerBookingDetailSheet
+        booking={detailBooking}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+      />
 
       <SubmitBookingPaymentDialog
         open={submitOpen}

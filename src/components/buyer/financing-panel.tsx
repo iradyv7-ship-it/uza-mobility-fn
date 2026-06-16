@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { BuyerFinancingDetailSheet } from '@/components/buyer/financing-detail-sheet';
 import { FinancingRequestDialog } from '@/components/buyer/financing-request-dialog';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { PageHeader } from '@/components/shared/page-header';
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/table';
 import { formatDate, formatUsd } from '@/lib/format';
 import { useMyFinancing } from '@/queries/buyer';
+import type { BuyerFinancingRequest } from '@/types/buyer/commerce';
 
 export function BuyerFinancingPanel() {
   const searchParams = useSearchParams();
@@ -25,6 +27,9 @@ export function BuyerFinancingPanel() {
   const [defaultInvoiceId, setDefaultInvoiceId] = useState<
     string | undefined
   >();
+  const [detailRequest, setDetailRequest] =
+    useState<BuyerFinancingRequest | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
   const { data, isLoading, isError, error } = useMyFinancing();
 
   useEffect(() => {
@@ -64,13 +69,14 @@ export function BuyerFinancingPanel() {
               <TableHead>Status</TableHead>
               <TableHead>Deposit</TableHead>
               <TableHead>Submitted</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell colSpan={4}>
+                    <TableCell colSpan={5}>
                       <Skeleton className="h-8 w-full" />
                     </TableCell>
                   </TableRow>
@@ -79,7 +85,7 @@ export function BuyerFinancingPanel() {
             {!isLoading && (data?.length ?? 0) === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={5}
                   className="py-8 text-center text-muted-foreground"
                 >
                   No financing requests yet.
@@ -98,11 +104,29 @@ export function BuyerFinancingPanel() {
                     : '—'}
                 </TableCell>
                 <TableCell>{formatDate(row.createdAt)}</TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setDetailRequest(row);
+                      setDetailOpen(true);
+                    }}
+                  >
+                    Details
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+
+      <BuyerFinancingDetailSheet
+        request={detailRequest}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+      />
 
       <FinancingRequestDialog
         open={requestOpen}

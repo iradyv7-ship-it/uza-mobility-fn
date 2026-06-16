@@ -186,11 +186,13 @@ export function Register() {
                 {emailInUse ? (
                   <p className="text-sm text-red-800/90">
                     <Link
-                      href={`${authRoutes.login}?email=${encodeURIComponent(form.getValues('email'))}`}
+                      href={`${authRoutes.login}?email=${encodeURIComponent(form.getValues('email'))}${callbackUrl.startsWith('/') ? `&callbackUrl=${encodeURIComponent(callbackUrl)}` : ''}`}
                       className="font-medium underline underline-offset-2"
                     >
                       Sign in with this email
                     </Link>
+                    {' · '}
+                    Try Google sign-in below if you used that before
                   </p>
                 ) : null}
               </AuthFormMessage>

@@ -13,9 +13,14 @@ import { authRoutes } from '@/config/routes';
 type CheckEmailFormProps = {
   email: string;
   callbackUrl?: string;
+  linkedExistingAccount?: boolean;
 };
 
-export function CheckEmailForm({ email, callbackUrl }: CheckEmailFormProps) {
+export function CheckEmailForm({
+  email,
+  callbackUrl,
+  linkedExistingAccount = false,
+}: CheckEmailFormProps) {
   const loginHref = (() => {
     const params = new URLSearchParams();
     if (email) params.set('email', email);
@@ -33,13 +38,17 @@ export function CheckEmailForm({ email, callbackUrl }: CheckEmailFormProps) {
         <AuthPageHeader
           title="Check your email"
           description={
-            email
-              ? `We sent a verification link to ${email}. Open it to activate your account, then sign in.`
-              : 'We sent a verification link to your email. Open it to activate your account, then sign in.'
+            linkedExistingAccount
+              ? email
+                ? `We sent a password setup link to ${email}. Use it to sign in with email and password, or continue with Google using the same address. Your previous inquiries will appear in your account.`
+                : 'We sent a password setup link to your email. Use it to sign in with email and password, or continue with Google.'
+              : email
+                ? `We sent a verification link to ${email}. Open it to activate your account, then sign in.`
+                : 'We sent a verification link to your email. Open it to activate your account, then sign in.'
           }
         />
 
-        {email ? (
+        {email && !linkedExistingAccount ? (
           <AuthPrimaryButton
             type="button"
             disabled={resend.isPending}

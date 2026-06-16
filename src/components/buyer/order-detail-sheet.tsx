@@ -1,18 +1,27 @@
 'use client';
 
-import { StatusBadge } from '@/components/shared/status-badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import Link from 'next/link';
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
-import { formatDateTime, formatUsd } from '@/lib/format';
+  BuyerDetailRow,
+  BuyerDetailSection,
+  BuyerDetailNote,
+  BuyerDetailTracking,
+} from '@/components/buyer/detail-fields';
+import {
+  BuyerDetailSheetBody,
+  BuyerDetailSheetHeader,
+  BuyerDetailSummary,
+} from '@/components/buyer/detail-sheet-layout';
+import { StatusBadge } from '@/components/shared/status-badge';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { formatDate, formatDateTime, formatUsd } from '@/lib/format';
 import { formatSellerChannel } from '@/lib/auth/seller-profiles';
+import { buyerDetailSheetClassName } from '@/lib/buyer/detail-sheet';
 import { useOrderTracking } from '@/queries/buyer';
 import type { BuyerOrder } from '@/types/buyer/commerce';
+
+const vehicleLinkClassName =
+  'font-medium text-[#046A38] underline-offset-4 hover:underline';
 
 type OrderDetailSheetProps = {
   order: BuyerOrder | null;
@@ -31,60 +40,93 @@ export function BuyerOrderDetailSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex w-full flex-col overflow-y-auto sm:max-w-lg">
+      <SheetContent className={buyerDetailSheetClassName}>
         {!order ? null : (
           <>
-            <SheetHeader>
-              <SheetTitle>{order.orderNumber}</SheetTitle>
-              <SheetDescription>
-                {order.listing.listingTitle} ·{' '}
-                {formatSellerChannel(order.sellerType)}
-              </SheetDescription>
-            </SheetHeader>
-            <div className="mt-6 space-y-6">
-              <StatusBadge status={order.status} />
-              <dl className="grid gap-2 text-sm">
-                <div className="flex justify-between gap-4">
-                  <dt className="text-muted-foreground">Vehicle</dt>
-                  <dd>
-                    {order.listing.brand} {order.listing.model}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-muted-foreground">Invoice</dt>
-                  <dd>{order.invoice.invoiceNumber}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-muted-foreground">Amount</dt>
-                  <dd className="font-medium">
-                    {formatUsd(order.invoice.totalAmountUsd)}
-                  </dd>
-                </div>
-              </dl>
-              <div>
-                <h3 className="mb-3 text-sm font-medium">Tracking</h3>
-                {isLoading ? (
-                  <Skeleton className="h-24 w-full" />
-                ) : (
-                  <ol className="space-y-3 border-l pl-4">
-                    {tracking?.events.map((event) => (
-                      <li key={event.id} className="relative text-sm">
-                        <span className="absolute top-1.5 -left-[21px] size-2 rounded-full bg-primary" />
-                        <p className="font-medium">{event.title}</p>
-                        {event.description ? (
-                          <p className="text-muted-foreground">
-                            {event.description}
-                          </p>
-                        ) : null}
-                        <p className="text-xs text-muted-foreground">
-                          {formatDateTime(event.occurredAt)}
-                        </p>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-              </div>
-            </div>
+            <BuyerDetailSheetHeader
+              title={order.orderNumber}
+              description={`${order.listing.listingTitle} · ${formatSellerChannel(order.sellerType)}`}
+              meta={<StatusBadge status={order.status} />}
+            />
+
+            <BuyerDetailSheetBody>
+              <BuyerDetailSummary
+                items={[
+                  {
+                    label: 'Total paid',
+                    value: formatUsd(order.invoice.totalAmountUsd),
+                    emphasis: true,
+                  },
+                  {
+                    label: 'Invoice',
+                    value: order.invoice.invoiceNumber,
+                  },
+                  {
+                    label: 'Payment reference',
+                    value: order.invoice.paymentReference,
+                  },
+                  {
+                    label: 'Est. delivery',
+                    value: formatDate(order.estimatedDeliveryDate),
+                  },
+                ]}
+              />
+
+              <BuyerDetailSection title="Vehicle">
+                <BuyerDetailRow
+                  label="Make / model / year"
+                  value={`${order.listing.brand} ${order.listing.model} · ${order.listing.manufacturingYear}`}
+                  fullWidth
+                />
+                <BuyerDetailRow
+                  label="Listing"
+                  value={
+                    <Link
+                      href={`/vehicles/${order.listing.slug}`}
+                      className={vehicleLinkClassName}
+                    >
+                      View vehicle page
+                    </Link>
+                  }
+                  fullWidth
+                />
+              </BuyerDetailSection>
+
+              <BuyerDetailSection title="Delivery">
+                <BuyerDetailRow
+                  label="City / country"
+                  value={
+                    [order.deliveryCity, order.deliveryCountry]
+                      .filter(Boolean)
+                      .join(', ') || '—'
+                  }
+                />
+                <BuyerDetailRow
+                  label="Address"
+                  value={order.deliveryAddress}
+                  fullWidth
+                />
+                <BuyerDetailRow
+                  label="Delivered"
+                  value={formatDate(order.actualDeliveryDate)}
+                />
+                <BuyerDetailRow
+                  label="Order placed"
+                  value={formatDateTime(order.createdAt)}
+                />
+              </BuyerDetailSection>
+
+              {order.handoverNotes ? (
+                <BuyerDetailNote title="Handover notes">
+                  {order.handoverNotes}
+                </BuyerDetailNote>
+              ) : null}
+
+              <BuyerDetailTracking
+                events={tracking?.events}
+                isLoading={isLoading}
+              />
+            </BuyerDetailSheetBody>
           </>
         )}
       </SheetContent>

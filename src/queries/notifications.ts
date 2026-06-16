@@ -11,6 +11,7 @@ import {
   markNotificationRead,
 } from '@/lib/api/notifications';
 import type { NotificationsFilters } from '@/types/notifications';
+import { invalidateNotificationLists } from '@/lib/notifications/query-cache';
 
 export const notificationKeys = {
   all: ['notifications'] as const,
@@ -44,8 +45,9 @@ export function useUnreadNotificationCount(enabled = true) {
     queryKey: notificationKeys.unreadCount(userId ?? ''),
     queryFn: () => getUnreadNotificationCount(accessToken),
     enabled: ready && enabled,
-    refetchInterval: ready && enabled ? 60_000 : false,
-    refetchOnWindowFocus: true,
+    staleTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
   });
 }
 
@@ -59,6 +61,8 @@ export function useNotifications(
     queryKey: notificationKeys.list(userId ?? '', filters),
     queryFn: () => getNotifications(filters, accessToken),
     enabled: ready && enabled,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -70,9 +74,11 @@ export function useMarkNotificationRead() {
     mutationFn: (id: string) => markNotificationRead(id, accessToken),
     onSuccess: () => {
       if (userId) {
-        void queryClient.invalidateQueries({
-          queryKey: notificationKeys.all,
-        });
+        queryClient.setQueryData<number>(
+          notificationKeys.unreadCount(userId),
+          (count) => Math.max(0, (count ?? 1) - 1),
+        );
+        invalidateNotificationLists(queryClient);
       }
     },
     onError: (error) => toastError(error, 'Failed to mark notification read'),
@@ -88,9 +94,8 @@ export function useMarkAllNotificationsRead() {
     onSuccess: () => {
       toast.success('All notifications marked as read');
       if (userId) {
-        void queryClient.invalidateQueries({
-          queryKey: notificationKeys.all,
-        });
+        queryClient.setQueryData(notificationKeys.unreadCount(userId), 0);
+        invalidateNotificationLists(queryClient);
       }
     },
     onError: (error) =>

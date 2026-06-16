@@ -25,6 +25,7 @@ export function completeGoogleSignIn(code: string) {
 export type RegisterResponse = {
   message: string;
   email: string;
+  linkedExistingAccount?: boolean;
 };
 
 export function register(input: RegisterInput) {

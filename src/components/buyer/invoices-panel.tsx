@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { BuyerInvoiceDetailSheet } from '@/components/buyer/invoice-detail-sheet';
 import { InvoiceBankDetailsDialog } from '@/components/buyer/invoice-bank-details-dialog';
 import { RequestInvoiceDialog } from '@/components/buyer/request-invoice-dialog';
 import { SubmitPaymentDialog } from '@/components/buyer/submit-payment-dialog';
@@ -63,6 +64,8 @@ export function BuyerInvoicesPanel() {
   >();
   const [bankDetailsInvoice, setBankDetailsInvoice] =
     useState<BuyerInvoice | null>(null);
+  const [detailInvoice, setDetailInvoice] = useState<BuyerInvoice | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
   const [initialListing, setInitialListing] =
     useState<PublicListingSummary | null>(null);
   const [cancelInvoice, setCancelInvoice] = useState<BuyerInvoice | null>(null);
@@ -201,6 +204,16 @@ export function BuyerInvoicesPanel() {
                       <Button
                         size="sm"
                         variant="outline"
+                        onClick={() => {
+                          setDetailInvoice(invoice);
+                          setDetailOpen(true);
+                        }}
+                      >
+                        Details
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
                         disabled={openDoc.isPending}
                         onClick={() => openDoc.mutate(invoice.id)}
                       >
@@ -278,6 +291,20 @@ export function BuyerInvoicesPanel() {
         open={paymentOpen}
         onOpenChange={setPaymentOpen}
         defaultInvoiceId={paymentInvoiceId}
+      />
+
+      <BuyerInvoiceDetailSheet
+        invoice={detailInvoice}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        onSubmitPayment={onSubmitPayment}
+        onDownload={(inv) =>
+          downloadDoc.mutate({
+            invoiceId: inv.id,
+            invoiceNumber: inv.invoiceNumber,
+          })
+        }
+        downloading={downloadDoc.isPending}
       />
 
       <InvoiceBankDetailsDialog

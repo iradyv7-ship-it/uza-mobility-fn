@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { BuyerPaymentDetailSheet } from '@/components/buyer/payment-detail-sheet';
 import { SubmitPaymentDialog } from '@/components/buyer/submit-payment-dialog';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { PaginationBar } from '@/components/shared/pagination-bar';
@@ -18,7 +19,10 @@ import {
 } from '@/components/ui/table';
 import { formatDate, formatUsd } from '@/lib/format';
 import { useMyPayments } from '@/queries/buyer';
-import type { BuyerPaymentsFilters } from '@/types/buyer/commerce';
+import type {
+  BuyerPayment,
+  BuyerPaymentsFilters,
+} from '@/types/buyer/commerce';
 
 function paymentStatusHint(status: string): string | null {
   switch (status) {
@@ -46,6 +50,8 @@ export function BuyerPaymentsPanel() {
   const [defaultInvoiceId, setDefaultInvoiceId] = useState<
     string | undefined
   >();
+  const [detailPayment, setDetailPayment] = useState<BuyerPayment | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const { data, isLoading, isError, error } = useMyPayments(filters);
 
@@ -137,17 +143,29 @@ export function BuyerPaymentsPanel() {
                   </TableCell>
                   <TableCell>{formatDate(payment.createdAt)}</TableCell>
                   <TableCell className="text-right">
-                    {payment.status === 'REJECTED' ? (
+                    <div className="flex flex-wrap justify-end gap-2">
                       <Button
                         size="sm"
+                        variant="outline"
                         onClick={() => {
-                          setDefaultInvoiceId(payment.invoiceId);
-                          setSubmitOpen(true);
+                          setDetailPayment(payment);
+                          setDetailOpen(true);
                         }}
                       >
-                        Resubmit payment
+                        Details
                       </Button>
-                    ) : null}
+                      {payment.status === 'REJECTED' ? (
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setDefaultInvoiceId(payment.invoiceId);
+                            setSubmitOpen(true);
+                          }}
+                        >
+                          Resubmit payment
+                        </Button>
+                      ) : null}
+                    </div>
                   </TableCell>
                 </TableRow>
               );
@@ -162,6 +180,12 @@ export function BuyerPaymentsPanel() {
           onPageChange={(page) => setFilters((f) => ({ ...f, page }))}
         />
       ) : null}
+
+      <BuyerPaymentDetailSheet
+        payment={detailPayment}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+      />
 
       <SubmitPaymentDialog
         open={submitOpen}

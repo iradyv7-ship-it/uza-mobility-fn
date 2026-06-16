@@ -104,7 +104,9 @@ export function useRequestVehicleBooking() {
   return useMutation({
     mutationFn: requestVehicleBooking,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: bookingKeys.all });
+      void queryClient.invalidateQueries({
+        predicate: (query) => isMineBookingsQuery(query.queryKey),
+      });
     },
     onError: (error) => toastError(error, 'Unable to create booking'),
   });
@@ -151,7 +153,9 @@ export function useSubmitBookingPayment() {
       return submitBookingPayment(bookingId, form);
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: bookingKeys.all });
+      void queryClient.invalidateQueries({
+        predicate: (query) => isMineBookingsQuery(query.queryKey),
+      });
       toast.success('Booking payment submitted for verification');
     },
     onError: (error) => toastError(error, 'Unable to submit booking payment'),

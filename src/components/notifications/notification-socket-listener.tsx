@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { io, type Socket } from 'socket.io-client';
+import { applyNotificationPush } from '@/lib/notifications/query-cache';
 import {
   getNotificationsSocketUrl,
   NOTIFICATION_SOCKET_EVENT,
@@ -11,24 +12,31 @@ import {
 import { notificationKeys } from '@/queries/notifications';
 import type { AppNotification } from '@/types/notifications';
 
-/**
- * Single app-wide Socket.IO connection for `/notifications`.
- * Invalidates notification queries when the server pushes a new alert.
- */
 export function NotificationSocketListener() {
   const { data: session, status } = useSession();
   const queryClient = useQueryClient();
   const socketRef = useRef<Socket | null>(null);
+  const userIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
-    if (status !== 'authenticated') {
+    const token = session?.accessToken;
+    const userId = session?.user?.id;
+
+    if (status !== 'authenticated' || !token || !userId) {
       socketRef.current?.disconnect();
       socketRef.current = null;
+      userIdRef.current = undefined;
       return;
     }
 
-    const token = session?.accessToken;
-    if (!token || session?.error === 'RefreshAccessTokenError') {
+    if (session?.error === 'RefreshAccessTokenError') {
+      return;
+    }
+
+    userIdRef.current = userId;
+
+    if (socketRef.current) {
+      socketRef.current.auth = { token };
       return;
     }
 
@@ -41,18 +49,27 @@ export function NotificationSocketListener() {
 
     socketRef.current = socket;
 
-    const currentUserId = session?.user?.id;
+    const syncUnreadOnConnect = () => {
+      void queryClient.invalidateQueries({
+        queryKey: notificationKeys.unreadCount(userId),
+      });
+    };
 
     const onNotification = (payload: AppNotification) => {
+      const currentUserId = userIdRef.current;
       if (currentUserId && payload.userId !== currentUserId) {
         return;
       }
-      void queryClient.invalidateQueries({ queryKey: notificationKeys.all });
+      if (currentUserId) {
+        applyNotificationPush(queryClient, currentUserId, payload);
+      }
     };
 
+    socket.on('connect', syncUnreadOnConnect);
     socket.on(NOTIFICATION_SOCKET_EVENT, onNotification);
 
     return () => {
+      socket.off('connect', syncUnreadOnConnect);
       socket.off(NOTIFICATION_SOCKET_EVENT, onNotification);
       socket.disconnect();
       if (socketRef.current === socket) {
@@ -61,8 +78,8 @@ export function NotificationSocketListener() {
     };
   }, [
     status,
-    session?.accessToken,
     session?.user?.id,
+    session?.accessToken,
     session?.error,
     queryClient,
   ]);
