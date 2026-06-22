@@ -1,24 +1,63 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { getPublicCategories } from '@/lib/api/catalog';
 import type { Category } from '@/types/catalog';
 
-const MarketingCatalogContext = createContext<Category[]>([]);
+type MarketingCatalogState = {
+  categories: Category[];
+  isLoading: boolean;
+};
+
+const MarketingCatalogContext = createContext<MarketingCatalogState>({
+  categories: [],
+  isLoading: true,
+});
 
 export function MarketingCatalogProvider({
-  categories,
   children,
 }: {
-  categories: Category[];
   children: React.ReactNode;
 }) {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void getPublicCategories()
+      .then((items) => {
+        if (!cancelled) {
+          setCategories(items);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCategories([]);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
-    <MarketingCatalogContext.Provider value={categories}>
+    <MarketingCatalogContext.Provider value={{ categories, isLoading }}>
       {children}
     </MarketingCatalogContext.Provider>
   );
 }
 
 export function useMarketingCategories(): Category[] {
-  return useContext(MarketingCatalogContext);
+  return useContext(MarketingCatalogContext).categories;
+}
+
+export function useMarketingCatalogLoading(): boolean {
+  return useContext(MarketingCatalogContext).isLoading;
 }

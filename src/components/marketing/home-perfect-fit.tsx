@@ -3,9 +3,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { HomePerfectFitSkeleton } from '@/components/marketing/home-perfect-fit-skeleton';
 import { ListingCard } from '@/components/marketing/listing-card';
 import { ListingGridSkeleton } from '@/components/marketing/listing-grid-skeleton';
-import { useMarketingCategories } from '@/components/marketing/marketing-catalog-context';
+import {
+  useMarketingCatalogLoading,
+  useMarketingCategories,
+} from '@/components/marketing/marketing-catalog-context';
 import { browseListings } from '@/lib/api/marketplace';
 import { buildPerfectFitTabs } from '@/lib/marketing/marketing-catalog-nav';
 import { brand } from '@/lib/marketing/colors';
@@ -18,6 +22,7 @@ import type { PublicListing } from '@/types/marketplace/public-listing';
 
 export function HomePerfectFit() {
   const categories = useMarketingCategories();
+  const catalogLoading = useMarketingCatalogLoading();
   const tabs = useMemo(() => buildPerfectFitTabs(categories), [categories]);
 
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
@@ -69,6 +74,10 @@ export function HomePerfectFit() {
     setActiveTabId(tabId);
     setPage(1);
   };
+
+  if (catalogLoading) {
+    return <HomePerfectFitSkeleton />;
+  }
 
   if (tabs.length === 0) {
     return null;
