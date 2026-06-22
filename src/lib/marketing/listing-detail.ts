@@ -157,6 +157,8 @@ export function formatHandoverLine(listing: PublicListing): string {
 export type VehicleSpecRow = {
   label: string;
   value: string;
+  /** When set, UI shows a color swatch instead of the raw value. */
+  colorHex?: string;
 };
 
 export type VehicleSpecGroup = {
@@ -170,6 +172,28 @@ function specRow(
 ): VehicleSpecRow {
   const text = value?.trim();
   return { label, value: text && text.length > 0 ? text : '—' };
+}
+
+const HEX_COLOR_RE = /^#[0-9A-Fa-f]{6}$/;
+const SHORT_HEX_COLOR_RE = /^#[0-9A-Fa-f]{3}$/;
+
+export function normalizeVehicleColorHex(color?: string | null): string | null {
+  const trimmed = color?.trim();
+  if (!trimmed) return null;
+  if (HEX_COLOR_RE.test(trimmed)) return trimmed;
+  if (SHORT_HEX_COLOR_RE.test(trimmed)) {
+    const [, r, g, b] = trimmed;
+    return `#${r}${r}${g}${g}${b}${b}`;
+  }
+  return null;
+}
+
+function specRowColor(color: string | null | undefined): VehicleSpecRow {
+  const hex = normalizeVehicleColorHex(color);
+  if (hex) {
+    return { label: 'Color', value: '—', colorHex: hex };
+  }
+  return specRow('Color', color);
 }
 
 function specRowNumber(
@@ -219,7 +243,7 @@ export function buildVehicleSidebarSpecRows(
     specRow('Drive type', formatDrivetrainLabel(listing.drivetrain) ?? '—'),
     specRow('Condition', formatConditionLabel(listing.condition)),
     specRow('Seats', listing.seats != null ? String(listing.seats) : '—'),
-    specRow('Color', listing.color),
+    specRowColor(listing.color),
   ];
 }
 

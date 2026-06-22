@@ -1,4 +1,4 @@
-import { Battery, Car, Gauge, Settings2 } from 'lucide-react';
+import { Battery, Car, Gauge, Palette, Settings2 } from 'lucide-react';
 import type { VehicleSpecRow } from '@/lib/marketing/listing-detail';
 
 const SPEC_ICONS: Record<string, typeof Car> = {
@@ -11,8 +11,25 @@ const SPEC_ICONS: Record<string, typeof Car> = {
   'Drive type': Car,
   Condition: Car,
   Seats: Car,
-  Color: Car,
+  Color: Palette,
 };
+
+function VehicleSpecValue({ row }: { row: VehicleSpecRow }) {
+  if (row.colorHex) {
+    return (
+      <span className="flex items-center">
+        <span
+          className="h-7 w-16 shrink-0 rounded-md"
+          style={{ backgroundColor: row.colorHex }}
+          role="img"
+          aria-label="Vehicle exterior color"
+        />
+      </span>
+    );
+  }
+
+  return <span className="text-[#151515]">{row.value}</span>;
+}
 
 type VehicleDetailSidebarSpecsProps = {
   rows: VehicleSpecRow[];
@@ -32,9 +49,9 @@ export function VehicleDetailSidebarSpecs({
             <li key={row.label} className="grid grid-cols-2 gap-4 py-3 text-sm">
               <span className="flex items-center gap-2 text-[#151515]">
                 <Icon className="size-[18px] shrink-0" />
-                {row.label}
+                <span className="text-[#151515]">{row.label}</span>
               </span>
-              <span className="text-[#151515]">{row.value}</span>
+              <VehicleSpecValue row={row} />
             </li>
           );
         })}
