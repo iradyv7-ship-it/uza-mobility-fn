@@ -7,8 +7,19 @@ function formatUsd(value: number | undefined) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(value);
+}
+
+function formatDiscountLine(
+  amount: number | undefined,
+  ratePercent?: number,
+): string {
+  const formatted = formatUsd(amount);
+  if (ratePercent != null && ratePercent > 0) {
+    return `${formatted} (${ratePercent}%)`;
+  }
+  return formatted;
 }
 
 function Line({
@@ -52,6 +63,10 @@ export function PricingBreakdown({
   }
 
   const type = sellerType ?? breakdown.sellerType;
+  const showRuleDiscount =
+    (breakdown.ruleDiscountUsd ?? 0) > 0 ||
+    breakdown.ruleDiscountRatePercent != null;
+  const showListingDiscount = (breakdown.discountUsd ?? 0) > 0;
 
   return (
     <div className="space-y-2 rounded-lg border bg-muted/30 p-3">
@@ -68,6 +83,21 @@ export function PricingBreakdown({
             label="Platform commission"
             value={formatUsd(breakdown.commissionUsd)}
           />
+          {showRuleDiscount ? (
+            <Line
+              label="Rule discount"
+              value={formatDiscountLine(
+                breakdown.ruleDiscountUsd,
+                breakdown.ruleDiscountRatePercent,
+              )}
+            />
+          ) : null}
+          {showListingDiscount ? (
+            <Line
+              label="Listing discount"
+              value={formatUsd(breakdown.discountUsd)}
+            />
+          ) : null}
           <Line
             label="Buyer pays (list price)"
             value={formatUsd(breakdown.finalPriceUsd)}
@@ -87,13 +117,24 @@ export function PricingBreakdown({
             value={formatUsd(breakdown.taxesEstimateUsd)}
           />
           <Line
-            label="Insurance (est.)"
-            value={formatUsd(breakdown.insuranceUsd)}
-          />
-          <Line
             label="Platform margin"
             value={formatUsd(breakdown.marginUsd)}
           />
+          {showRuleDiscount ? (
+            <Line
+              label="Rule discount"
+              value={formatDiscountLine(
+                breakdown.ruleDiscountUsd,
+                breakdown.ruleDiscountRatePercent,
+              )}
+            />
+          ) : null}
+          {showListingDiscount ? (
+            <Line
+              label="Listing discount"
+              value={formatUsd(breakdown.discountUsd)}
+            />
+          ) : null}
           <Line
             label="Buyer pays (list price)"
             value={formatUsd(breakdown.finalPriceUsd)}

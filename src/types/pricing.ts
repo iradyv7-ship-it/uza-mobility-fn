@@ -11,7 +11,10 @@ export type PriceBreakdown = {
   clearingFeeUsd?: number;
   landingCostUsd?: number;
   marginUsd?: number;
+  platformMarginRatePercent?: number;
   commissionUsd?: number;
+  ruleDiscountUsd?: number;
+  ruleDiscountRatePercent?: number;
   discountUsd?: number;
   finalPriceUsd: number;
   deliveryDaysMin: number;
