@@ -19,6 +19,7 @@ export function VehicleDetailHeroMedia({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [loadVideo, setLoadVideo] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+  const [posterReady, setPosterReady] = useState(false);
 
   useEffect(() => {
     if (!videoUrl) return;
@@ -57,8 +58,11 @@ export function VehicleDetailHeroMedia({
         <img
           src={posterUrl}
           alt=""
+          loading="eager"
+          decoding="async"
+          onLoad={() => setPosterReady(true)}
           className={`${mediaClassName} transition-opacity duration-700 ease-out ${
-            fadePoster ? 'opacity-0' : 'opacity-100'
+            fadePoster || !posterReady ? 'opacity-0' : 'opacity-100'
           }`}
         />
       ) : null}

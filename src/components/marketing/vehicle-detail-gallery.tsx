@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { resolveMediaUrl } from '@/lib/marketing/listing-display';
 import { brand } from '@/lib/marketing/colors';
 import type { PublicListingPhoto } from '@/types/marketplace/public-listing';
@@ -25,8 +26,10 @@ export function VehicleDetailGallery({
     );
 
   const [index, setIndex] = useState(0);
+  const [loadedUrls, setLoadedUrls] = useState<Record<string, boolean>>({});
   const current = resolved[index];
   const hasMultiple = resolved.length > 1;
+  const currentLoaded = current ? Boolean(loadedUrls[current.resolvedUrl]) : false;
 
   const prev = () => {
     if (resolved.length === 0) return;
@@ -42,14 +45,29 @@ export function VehicleDetailGallery({
     <div className="relative overflow-hidden rounded-2xl border border-[#E9E9E9] bg-[#f4f4f4]">
       <div className="relative aspect-[859/528] w-full">
         {current?.resolvedUrl ? (
-          <Image
-            src={current.resolvedUrl}
-            alt={current.altText ?? title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 859px"
-            priority
-          />
+          <>
+            {!currentLoaded ? (
+              <Skeleton className="absolute inset-0 rounded-none" aria-hidden />
+            ) : null}
+            <Image
+              key={current.resolvedUrl}
+              src={current.resolvedUrl}
+              alt={current.altText ?? title}
+              fill
+              className={`object-cover transition-opacity duration-300 ${
+                currentLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              sizes="(max-width: 1024px) 100vw, 859px"
+              priority={index === 0}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              onLoad={() =>
+                setLoadedUrls((prevUrls) => ({
+                  ...prevUrls,
+                  [current.resolvedUrl]: true,
+                }))
+              }
+            />
+          </>
         ) : (
           <div className="flex h-full items-center justify-center text-[#356769]">
             No photos yet
@@ -61,7 +79,7 @@ export function VehicleDetailGallery({
             <button
               type="button"
               onClick={prev}
-              className="absolute top-1/2 left-3 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow"
+              className="absolute top-1/2 left-3 z-[1] flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow"
               style={{ color: brand.forest }}
               aria-label="Previous photo"
             >
@@ -70,7 +88,7 @@ export function VehicleDetailGallery({
             <button
               type="button"
               onClick={next}
-              className="absolute top-1/2 right-3 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow"
+              className="absolute top-1/2 right-3 z-[1] flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow"
               style={{ color: brand.forest }}
               aria-label="Next photo"
             >
@@ -84,7 +102,7 @@ export function VehicleDetailGallery({
             href={videoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="absolute bottom-4 left-3 inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium"
+            className="absolute bottom-4 left-3 z-[1] inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium"
             style={{ backgroundColor: brand.lime, color: brand.forest }}
           >
             <Play className="size-4 fill-current" />

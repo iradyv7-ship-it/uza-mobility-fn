@@ -3,8 +3,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import { ArrowUpRight, Battery, Gauge } from 'lucide-react';
 import { WishlistButton } from '@/components/marketing/wishlist-button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   formatDrivetrainLabel,
   formatListingPrice,
@@ -26,24 +28,40 @@ export function ListingCard({ listing }: ListingCardProps) {
   const rangeKm = listing.evSpecs?.rangeKm;
   const batteryKwh = listing.evSpecs?.batteryCapacityKwh;
   const transmission = formatDrivetrainLabel(listing.drivetrain);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-[#E9E9E9] bg-white">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-[#E9E9E9] bg-white transition-shadow hover:border-[#d6d6d6] hover:shadow-sm">
+      <Link
+        href={detailHref}
+        className="absolute inset-0 z-[1]"
+        aria-label={`View details for ${listing.listingTitle}`}
+      />
+
       <div className="relative aspect-[318/212] w-full bg-[#f4f4f4]">
         {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={listing.listingTitle}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 318px"
-          />
+          <>
+            {!imageLoaded ? (
+              <Skeleton className="absolute inset-0 rounded-none" aria-hidden />
+            ) : null}
+            <Image
+              src={imageUrl}
+              alt={listing.listingTitle}
+              fill
+              className={`object-cover transition-opacity duration-300 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              sizes="(max-width: 768px) 100vw, 318px"
+              loading="lazy"
+              onLoad={() => setImageLoaded(true)}
+            />
+          </>
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-[#356769]">
             No photo
           </div>
         )}
-        <div className="absolute inset-0 p-3 sm:p-4">
+        <div className="pointer-events-none absolute inset-0 z-[2] p-3 sm:p-4">
           <div className="pointer-events-auto absolute top-3 left-3 sm:top-4 sm:left-4">
             <WishlistButton
               listingId={listing.id}
@@ -95,14 +113,14 @@ export function ListingCard({ listing }: ListingCardProps) {
           <p className="text-lg font-semibold text-[#151515]">
             {formatListingPrice(listing)}
           </p>
-          <Link
-            href={detailHref}
-            className="inline-flex items-center gap-1 text-sm font-medium"
+          <span
+            className="inline-flex items-center gap-1 text-sm font-medium transition-opacity group-hover:opacity-80"
             style={{ color: brand.forest }}
+            aria-hidden
           >
             View Details
             <ArrowUpRight className="size-3.5" aria-hidden />
-          </Link>
+          </span>
         </div>
       </div>
     </article>

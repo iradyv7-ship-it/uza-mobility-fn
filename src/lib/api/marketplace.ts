@@ -25,16 +25,20 @@ export type BrowseListingsFilters = {
   priceMax?: number;
 };
 
+const publicListingCache = { next: { revalidate: 60 } } as const;
+
 export function getLocalStockListings() {
-  return apiFetch<PublicListing[]>('/listings/local-stock');
+  return apiFetch<PublicListing[]>('/listings/local-stock', publicListingCache);
 }
 
 export function getFeaturedListings() {
-  return apiFetch<PublicListing[]>('/listings/featured');
+  return apiFetch<PublicListing[]>('/listings/featured', publicListingCache);
 }
 
 export function getListingBySlug(slug: string) {
-  return apiFetch<PublicListing>(`/listings/${encodeURIComponent(slug)}`);
+  return apiFetch<PublicListing>(`/listings/${encodeURIComponent(slug)}`, {
+    ...publicListingCache,
+  });
 }
 
 export function getWishlistIds(token: string) {
@@ -93,6 +97,7 @@ export function browseListings(filters: BrowseListingsFilters = {}) {
 
   return apiFetchPaginated<PublicListing>('/listings', {
     searchParams: params,
+    ...publicListingCache,
   });
 }
 
@@ -107,5 +112,5 @@ export function getBrowseFilterOptions(options?: {
   const path = qs
     ? `/listings/browse-filters?${qs}`
     : '/listings/browse-filters';
-  return apiFetch<BrowseFilterOptions>(path);
+  return apiFetch<BrowseFilterOptions>(path, publicListingCache);
 }
