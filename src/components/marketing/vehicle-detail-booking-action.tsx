@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { workspaceRoutes } from '@/config/routes';
 import { brand } from '@/lib/marketing/colors';
-import { formatUsd } from '@/lib/format';
+import { usePriceCurrency } from '@/components/marketing/price-currency-provider';
 import {
   bookingPaymentWasRejected,
   bookingStatusHint,
@@ -56,6 +56,7 @@ export function VehicleDetailBookingAction({
 }: VehicleDetailBookingActionProps) {
   const router = useAppRouter();
   const { data: session, status } = useSession();
+  const { formatAmount } = usePriceCurrency();
   const me = isMeUser(session?.user) ? session.user : null;
   const isAuthenticatedBuyer =
     status === 'authenticated' && Boolean(me?.roles.includes('BUYER'));
@@ -132,16 +133,6 @@ export function VehicleDetailBookingAction({
   }
 
   if (!isAuthenticatedBuyer) {
-    if (listing.isBooked || listing.status === 'SOLD') {
-      return (
-        <div className="mt-8">
-          <VehiclePurchaseUnavailable
-            variant={listing.status === 'SOLD' ? 'sold' : 'booked'}
-          />
-        </div>
-      );
-    }
-
     return (
       <>
         <div className="mt-8 space-y-2">
@@ -210,7 +201,7 @@ export function VehicleDetailBookingAction({
               </p>
             ) : null}
             <p className="mt-2 text-[#356769]">
-              Booking fee: {formatUsd(activeBooking.bookingFeeUsd)}
+              Booking fee: {formatAmount(activeBooking.bookingFeeUsd)}
             </p>
           </div>
           {isBookingPaymentSubmittable(activeBooking) ? (
@@ -296,7 +287,7 @@ export function VehicleDetailBookingAction({
             </p>
           ) : null}
           <p className="mt-2 text-[#356769]">
-            Amount: {formatUsd(activeInvoice.totalAmountUsd)}
+            Amount: {formatAmount(activeInvoice.totalAmountUsd)}
           </p>
         </div>
         <Button
@@ -314,22 +305,6 @@ export function VehicleDetailBookingAction({
               : 'View my invoice'}
           </Link>
         </Button>
-      </div>
-    );
-  }
-
-  if (listing.isBooked) {
-    return (
-      <div className="mt-8">
-        <VehiclePurchaseUnavailable variant="booked" />
-      </div>
-    );
-  }
-
-  if (listing.status === 'SOLD') {
-    return (
-      <div className="mt-8">
-        <VehiclePurchaseUnavailable variant="sold" />
       </div>
     );
   }
@@ -399,7 +374,7 @@ export function VehicleDetailBookingAction({
 
   const priceLabel =
     listing.listingPricing?.finalPriceUsd != null
-      ? formatUsd(listing.listingPricing.finalPriceUsd)
+      ? formatAmount(listing.listingPricing.finalPriceUsd)
       : 'the quoted price';
 
   return (
@@ -426,8 +401,7 @@ export function VehicleDetailBookingAction({
       <p className="text-center text-xs text-[#356769]">
         Buy requests a proforma invoice for {priceLabel} and lets you upload
         payment proof. Book secures the vehicle with a{' '}
-        {feeQuote ? formatUsd(feeQuote.bookingFeeUsd) : 'small USD'} booking
-        fee.
+        {feeQuote ? formatAmount(feeQuote.bookingFeeUsd) : 'small'} booking fee.
       </p>
     </div>
   );

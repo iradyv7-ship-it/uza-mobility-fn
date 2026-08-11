@@ -47,9 +47,7 @@ export function InvoiceBankDetailsDialog({
           </div>
           <div>
             <dt className="text-muted-foreground">Amount due</dt>
-            <dd className="font-medium">
-              {formatUsd(invoice.totalAmountUsd)} {invoice.currency}
-            </dd>
+            <dd className="font-medium">{formatUsd(invoice.totalAmountUsd)}</dd>
           </div>
           <div>
             <dt className="text-muted-foreground">Payment reference</dt>
@@ -61,16 +59,30 @@ export function InvoiceBankDetailsDialog({
               <dd>{invoice.beneficiaryName}</dd>
             </div>
           ) : null}
-          {invoice.bankName ? (
+          {invoice.bankName || invoice.accountNumber ? (
             <div>
-              <dt className="text-muted-foreground">Bank</dt>
-              <dd>{invoice.bankName}</dd>
+              <dt className="text-muted-foreground">USD receiving account</dt>
+              <dd>
+                {invoice.bankName ?? '—'}
+                {invoice.accountNumber ? (
+                  <span className="mt-1 block font-mono text-xs">
+                    {invoice.accountNumber}
+                  </span>
+                ) : null}
+              </dd>
             </div>
           ) : null}
-          {invoice.accountNumber ? (
+          {invoice.rwfBankName || invoice.rwfAccountNumber ? (
             <div>
-              <dt className="text-muted-foreground">Account number</dt>
-              <dd className="font-mono text-xs">{invoice.accountNumber}</dd>
+              <dt className="text-muted-foreground">Rwf receiving account</dt>
+              <dd>
+                {invoice.rwfBankName ?? '—'}
+                {invoice.rwfAccountNumber ? (
+                  <span className="mt-1 block font-mono text-xs">
+                    {invoice.rwfAccountNumber}
+                  </span>
+                ) : null}
+              </dd>
             </div>
           ) : null}
           {invoice.paymentDeadline ? (
@@ -80,6 +92,10 @@ export function InvoiceBankDetailsDialog({
             </div>
           ) : null}
         </dl>
+        <p className="text-xs text-muted-foreground">
+          Pay to either the USD or Rwf account and include the payment reference
+          on your transfer.
+        </p>
         {hint ? (
           <p className="rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">
             {hint}
@@ -98,32 +114,27 @@ export function InvoiceBankDetailsDialog({
             variant="outline"
             disabled={downloading}
             onClick={async () => {
-              setDownloading(true);
               try {
+                setDownloading(true);
                 await downloadInvoiceDocument(
                   invoice.id,
                   invoice.invoiceNumber,
                 );
-                toast.success('Invoice downloaded');
-              } catch (error) {
-                toast.error(
-                  error instanceof Error
-                    ? error.message
-                    : 'Could not download invoice',
-                );
+              } catch {
+                toast.error('Could not download invoice PDF');
               } finally {
                 setDownloading(false);
               }
             }}
           >
-            {downloading ? 'Downloading…' : 'Download invoice'}
+            {downloading ? 'Downloading…' : 'Download PDF'}
           </Button>
           {onSubmitPayment ? (
             <Button
               type="button"
               onClick={() => {
-                onSubmitPayment(invoice.id);
                 onOpenChange(false);
+                onSubmitPayment(invoice.id);
               }}
             >
               Submit payment

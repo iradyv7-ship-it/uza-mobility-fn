@@ -112,7 +112,7 @@ export type RequestInvoiceInput = z.infer<typeof requestInvoiceSchema>;
 export const submitPaymentSchema = z.object({
   invoiceId: z.string().min(1),
   amountPaid: z.number().min(0),
-  currency: z.string().max(8).optional(),
+  currency: z.enum(['USD', 'RWF']),
   bankName: z.string().max(200).optional(),
   transferReference: z.string().max(200).optional(),
   paymentDate: z.string().optional(),

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { PaymentProofFileInput } from '@/components/buyer/payment-proof-file-input';
+import { usePriceCurrency } from '@/components/marketing/price-currency-provider';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -10,8 +11,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { NumberInput } from '@/components/ui/number-input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { bookingPaymentWasRejected } from '@/lib/buyer/booking-flow';
-import { formatUsd } from '@/lib/format';
+import { formatUsd, usdtToRwf } from '@/lib/format';
 import { useSubmitBookingPayment } from '@/queries/bookings';
 import type { VehicleBooking } from '@/types/buyer/bookings';
 
@@ -27,22 +37,49 @@ export function SubmitBookingPaymentDialog({
   booking,
 }: SubmitBookingPaymentDialogProps) {
   const submit = useSubmitBookingPayment();
+  const { rate } = usePriceCurrency();
   const [proofs, setProofs] = useState<File[]>([]);
+  const [currency, setCurrency] = useState<'USD' | 'RWF'>('USD');
+  const [amountPaid, setAmountPaid] = useState('');
+
+  const effectiveRate = rate?.usdToRwfEffective ?? null;
+  const expectedRwf =
+    booking != null ? usdtToRwf(booking.bookingFeeUsd, effectiveRate) : null;
 
   useEffect(() => {
-    if (!open) {
+    if (!open || !booking) {
       setProofs([]);
+      setCurrency('USD');
+      setAmountPaid('');
+      return;
     }
-  }, [open, booking?.id]);
+    setCurrency('USD');
+    setAmountPaid(String(booking.bookingFeeUsd));
+    setProofs([]);
+  }, [open, booking?.id, booking?.bookingFeeUsd]);
+
+  const onCurrencyChange = (value: string) => {
+    const next = value === 'RWF' ? 'RWF' : 'USD';
+    setCurrency(next);
+    if (!booking) return;
+    if (next === 'RWF') {
+      setAmountPaid(String(expectedRwf ?? 0));
+      return;
+    }
+    setAmountPaid(String(booking.bookingFeeUsd));
+  };
 
   const onSubmit = () => {
     if (!booking || proofs.length === 0) return;
+    const parsed = Number(amountPaid);
+    if (!Number.isFinite(parsed) || parsed <= 0) return;
 
     submit.mutate(
       {
         bookingId: booking.id,
         payload: {
-          amountPaid: booking.bookingFeeUsd,
+          amountPaid: parsed,
+          currency,
           transferReference: booking.paymentReference,
         },
         proofs,
@@ -96,6 +133,33 @@ export function SubmitBookingPaymentDialog({
               </p>
             </div>
 
+            <div className="space-y-1.5">
+              <Label>Paid to account</Label>
+              <Select value={currency} onValueChange={onCurrencyChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select account" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="USD">USD receiving account</SelectItem>
+                  <SelectItem value="RWF">Rwf receiving account</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="booking-amount">
+                Amount paid ({currency === 'RWF' ? 'Rwf' : 'USD'})
+              </Label>
+              <NumberInput
+                id="booking-amount"
+                min={0.01}
+                step="0.01"
+                value={amountPaid}
+                onChange={(event) => setAmountPaid(event.target.value)}
+                disabled={submit.isPending}
+              />
+            </div>
+
             <PaymentProofFileInput
               files={proofs}
               onFilesChange={setProofs}
@@ -119,7 +183,13 @@ export function SubmitBookingPaymentDialog({
           </Button>
           <Button
             type="button"
-            disabled={submit.isPending || !booking || proofs.length === 0}
+            disabled={
+              submit.isPending ||
+              !booking ||
+              proofs.length === 0 ||
+              !Number.isFinite(Number(amountPaid)) ||
+              Number(amountPaid) <= 0
+            }
             onClick={onSubmit}
           >
             {submit.isPending

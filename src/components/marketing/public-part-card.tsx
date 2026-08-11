@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { brand } from '@/lib/marketing/colors';
 import { partCompatibilityLabel } from '@/lib/marketing/part-display';
+import { formatUsd } from '@/lib/format';
 import type { PublicPart } from '@/types/marketplace/public-part';
 import { ArrowUpRight } from 'lucide-react';
 
@@ -55,7 +56,7 @@ export function PublicPartCard({ part }: PublicPartCardProps) {
 
         <div className="mt-auto flex items-center justify-between gap-3 pt-1">
           <p className="text-lg font-semibold text-[#151515]">
-            ${part.priceUsd.toLocaleString('en-US')}
+            {formatUsd(part.priceUsd)}
           </p>
           <Button
             type="button"

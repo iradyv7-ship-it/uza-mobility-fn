@@ -13,7 +13,12 @@ import {
   BuyerDetailSummary,
 } from '@/components/buyer/detail-sheet-layout';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { formatDate, formatDateTime, formatUsd } from '@/lib/format';
+import {
+  formatDate,
+  formatDateTime,
+  formatSettledAmount,
+  formatUsd,
+} from '@/lib/format';
 import { buyerDetailSheetClassName } from '@/lib/buyer/detail-sheet';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import type { BuyerPayment } from '@/types/buyer/commerce';
@@ -48,8 +53,15 @@ export function BuyerPaymentDetailSheet({
           <BuyerDetailSummary
             items={[
               {
+                label: 'Paid to account',
+                value: payment.currency === 'RWF' ? 'Rwf' : 'USD',
+              },
+              {
                 label: 'Amount paid',
-                value: `${formatUsd(payment.amountPaid)} ${payment.currency}`,
+                value: formatSettledAmount(
+                  payment.amountPaid,
+                  payment.currency,
+                ),
                 emphasis: true,
               },
               {

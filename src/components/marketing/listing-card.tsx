@@ -5,16 +5,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { ArrowUpRight, Battery, Gauge } from 'lucide-react';
+import { BuyerListingInteractionChip } from '@/components/marketing/buyer-listing-interaction-chip';
 import { WishlistButton } from '@/components/marketing/wishlist-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   formatDrivetrainLabel,
-  formatListingPrice,
   getListingPrimaryPhoto,
   listingDetailHref,
   listingSubtitle,
 } from '@/lib/marketing/listing-display';
+import { ListingPrice } from '@/components/marketing/listing-price';
 import { brand } from '@/lib/marketing/colors';
+import { useBuyerListingInteraction } from '@/hooks/use-buyer-listing-interactions';
 import type { PublicListing } from '@/types/marketplace/public-listing';
 
 type ListingCardProps = {
@@ -29,6 +31,7 @@ export function ListingCard({ listing }: ListingCardProps) {
   const batteryKwh = listing.evSpecs?.batteryCapacityKwh;
   const transmission = formatDrivetrainLabel(listing.drivetrain);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const buyerInteraction = useBuyerListingInteraction(listing.id);
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-[#E9E9E9] bg-white transition-shadow hover:border-[#d6d6d6] hover:shadow-sm">
@@ -69,13 +72,13 @@ export function ListingCard({ listing }: ListingCardProps) {
               callbackUrl={pathname || detailHref}
             />
           </div>
-          {listing.displayBadge ? (
-            <span
-              className="pointer-events-none absolute bottom-3 left-3 max-w-[calc(100%-1.5rem)] rounded-full px-3 py-1.5 text-xs font-semibold sm:bottom-4 sm:left-4"
-              style={{ backgroundColor: brand.lime, color: brand.forest }}
-            >
-              {listing.displayBadge}
-            </span>
+          {buyerInteraction ? (
+            <div className="absolute bottom-3 left-3 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-2 sm:bottom-4 sm:left-4">
+              <BuyerListingInteractionChip
+                interaction={buyerInteraction}
+                overlay
+              />
+            </div>
           ) : null}
         </div>
       </div>
@@ -111,7 +114,7 @@ export function ListingCard({ listing }: ListingCardProps) {
 
         <div className="flex items-end justify-between gap-2 pt-1">
           <p className="text-lg font-semibold text-[#151515]">
-            {formatListingPrice(listing)}
+            <ListingPrice listing={listing} />
           </p>
           <span
             className="inline-flex items-center gap-1 text-sm font-medium transition-opacity group-hover:opacity-80"

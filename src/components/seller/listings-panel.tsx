@@ -32,14 +32,7 @@ import {
 } from '@/queries/seller';
 import type { SellerListing } from '@/types/seller/marketplace';
 
-function formatUsd(value: number | null | undefined) {
-  if (value == null) return '—';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(value);
-}
+import { formatUsd } from '@/lib/format';
 
 export function SellerListingsPanel() {
   const canTrade = useSellerCanTrade();

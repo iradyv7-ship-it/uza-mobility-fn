@@ -29,7 +29,9 @@ export function VehicleDetailGallery({
   const [loadedUrls, setLoadedUrls] = useState<Record<string, boolean>>({});
   const current = resolved[index];
   const hasMultiple = resolved.length > 1;
-  const currentLoaded = current ? Boolean(loadedUrls[current.resolvedUrl]) : false;
+  const currentLoaded = current
+    ? Boolean(loadedUrls[current.resolvedUrl])
+    : false;
 
   const prev = () => {
     if (resolved.length === 0) return;

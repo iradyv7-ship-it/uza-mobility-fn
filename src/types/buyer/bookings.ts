@@ -17,6 +17,7 @@ export type VehicleBooking = {
   currency: string;
   status: VehicleBookingStatus;
   amountPaid?: number | null;
+  exchangeRateUsed?: number | null;
   bankName?: string | null;
   transferReference?: string | null;
   paymentDate?: string | null;

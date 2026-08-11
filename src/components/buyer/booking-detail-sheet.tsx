@@ -14,7 +14,12 @@ import {
   BuyerDetailSummary,
 } from '@/components/buyer/detail-sheet-layout';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { formatDate, formatDateTime, formatUsd } from '@/lib/format';
+import {
+  formatDate,
+  formatDateTime,
+  formatSettledAmount,
+  formatUsd,
+} from '@/lib/format';
 import { formatSellerChannel } from '@/lib/auth/seller-profiles';
 import { buyerDetailSheetClassName } from '@/lib/buyer/detail-sheet';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -65,7 +70,7 @@ export function BuyerBookingDetailSheet({
                 label: 'Amount paid',
                 value:
                   booking.amountPaid != null
-                    ? formatUsd(booking.amountPaid)
+                    ? `${formatSettledAmount(booking.amountPaid, booking.currency)} (${booking.currency === 'RWF' ? 'Rwf' : 'USD'} account)`
                     : 'Not submitted',
               },
               {

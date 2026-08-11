@@ -15,7 +15,12 @@ import {
 } from '@/components/buyer/detail-sheet-layout';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Button } from '@/components/ui/button';
-import { formatDate, formatDateTime, formatUsd } from '@/lib/format';
+import {
+  formatDate,
+  formatDateTime,
+  formatSettledAmount,
+  formatUsd,
+} from '@/lib/format';
 import { invoiceStatusHintFor } from '@/lib/buyer/invoice-flow';
 import { buyerDetailSheetClassName } from '@/lib/buyer/detail-sheet';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -108,21 +113,45 @@ export function BuyerInvoiceDetailSheet({
             />
           </BuyerDetailSection>
 
-          {invoice.beneficiaryName ||
-          invoice.bankName ||
-          invoice.accountNumber ? (
+          {(invoice.beneficiaryName ||
+            invoice.bankName ||
+            invoice.accountNumber ||
+            invoice.rwfBankName ||
+            invoice.rwfAccountNumber) && (
             <BuyerDetailSection title="Bank details">
               <BuyerDetailRow
                 label="Beneficiary"
                 value={invoice.beneficiaryName}
               />
-              <BuyerDetailRow label="Bank" value={invoice.bankName} />
               <BuyerDetailRow
-                label="Account number"
+                label="USD account"
                 value={
-                  invoice.accountNumber ? (
-                    <span className="font-mono text-xs">
-                      {invoice.accountNumber}
+                  invoice.bankName || invoice.accountNumber ? (
+                    <span>
+                      {invoice.bankName ?? '—'}
+                      {invoice.accountNumber ? (
+                        <span className="mt-1 block font-mono text-xs">
+                          {invoice.accountNumber}
+                        </span>
+                      ) : null}
+                    </span>
+                  ) : (
+                    '—'
+                  )
+                }
+                fullWidth
+              />
+              <BuyerDetailRow
+                label="Rwf account"
+                value={
+                  invoice.rwfBankName || invoice.rwfAccountNumber ? (
+                    <span>
+                      {invoice.rwfBankName ?? '—'}
+                      {invoice.rwfAccountNumber ? (
+                        <span className="mt-1 block font-mono text-xs">
+                          {invoice.rwfAccountNumber}
+                        </span>
+                      ) : null}
                     </span>
                   ) : (
                     '—'
@@ -131,7 +160,7 @@ export function BuyerInvoiceDetailSheet({
                 fullWidth
               />
             </BuyerDetailSection>
-          ) : null}
+          )}
 
           {invoice.payments && invoice.payments.length > 0 ? (
             <BuyerDetailSection title="Payment history">
@@ -141,7 +170,13 @@ export function BuyerInvoiceDetailSheet({
                   label={formatDate(payment.createdAt)}
                   value={
                     <span className="inline-flex flex-wrap items-center gap-2">
-                      {formatUsd(payment.amountPaid)}
+                      {formatSettledAmount(
+                        payment.amountPaid,
+                        payment.currency,
+                      )}
+                      {payment.currency === 'RWF'
+                        ? ' · Rwf account'
+                        : ' · USD account'}
                       <StatusBadge status={payment.status} />
                     </span>
                   }

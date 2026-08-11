@@ -6,6 +6,7 @@ import { ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { HomePerfectFitSkeleton } from '@/components/marketing/home-perfect-fit-skeleton';
 import { ListingCard } from '@/components/marketing/listing-card';
 import { ListingGridSkeleton } from '@/components/marketing/listing-grid-skeleton';
+import { PriceCurrencyToggle } from '@/components/marketing/price-currency-provider';
 import {
   useMarketingCatalogLoading,
   useMarketingCategories,
@@ -91,16 +92,19 @@ export function HomePerfectFit() {
             <h2 className="text-3xl font-semibold text-[#151515]">
               Find Your Perfect Fit
             </h2>
-            {activeTab ? (
-              <Link
-                href={vehiclesHref({ category: activeTab.categorySlug })}
-                className="inline-flex shrink-0 items-center gap-1 text-sm font-medium"
-                style={{ color: brand.forest }}
-              >
-                View All
-                <ArrowUpRight className="size-3.5" aria-hidden />
-              </Link>
-            ) : null}
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+              <PriceCurrencyToggle />
+              {activeTab ? (
+                <Link
+                  href={vehiclesHref({ category: activeTab.categorySlug })}
+                  className="inline-flex shrink-0 items-center gap-1 text-sm font-medium"
+                  style={{ color: brand.forest }}
+                >
+                  View All
+                  <ArrowUpRight className="size-3.5" aria-hidden />
+                </Link>
+              ) : null}
+            </div>
           </div>
           <div className="flex flex-wrap gap-8 border-b border-transparent">
             {tabs.map((tab) => {

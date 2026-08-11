@@ -130,8 +130,20 @@ export function formatWarranty(listing: PublicListing): string {
 }
 
 export function formatStockLocation(listing: PublicListing): string {
-  if (listing.sellerType === 'UZA_RWANDA_STOCK') {
+  if (
+    listing.inventoryStage === 'KIGALI_STOCK' ||
+    listing.sellerType === 'UZA_RWANDA_STOCK'
+  ) {
     return 'Currently in Kigali Stock';
+  }
+  if (listing.inventoryStage === 'AT_PORT') {
+    return 'At port — onward to Kigali';
+  }
+  if (listing.inventoryStage === 'IN_TRANSIT') {
+    return 'In transit to Rwanda';
+  }
+  if (listing.inventoryStage === 'CHINA_UNPAID') {
+    return 'Available from China sourcing';
   }
   if (listing.city?.trim()) {
     return `Located in ${listing.city}`;
@@ -145,7 +157,8 @@ export function formatStockLocation(listing: PublicListing): string {
 export function formatHandoverLine(listing: PublicListing): string {
   const days = listing.deliveryEstimateDays;
   if (days == null) {
-    return listing.sellerType === 'UZA_RWANDA_STOCK'
+    return listing.inventoryStage === 'KIGALI_STOCK' ||
+      listing.sellerType === 'UZA_RWANDA_STOCK'
       ? 'Ready for handover in Kigali'
       : 'Delivery timeline confirmed at reservation';
   }

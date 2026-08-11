@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { ListingCard } from '@/components/marketing/listing-card';
+import { PriceCurrencyToggle } from '@/components/marketing/price-currency-provider';
 import { brand } from '@/lib/marketing/colors';
 import {
   marketingContainer,
@@ -26,14 +27,17 @@ export function HomeAvailableSection({ listings }: HomeAvailableSectionProps) {
               for immediate handover.
             </p>
           </div>
-          <Link
-            href="/vehicles?stock=local"
-            className="inline-flex shrink-0 items-center gap-1 text-sm font-medium"
-            style={{ color: brand.forest }}
-          >
-            View All
-            <ArrowUpRight className="size-3.5" aria-hidden />
-          </Link>
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+            <PriceCurrencyToggle />
+            <Link
+              href="/vehicles?stock=local"
+              className="inline-flex shrink-0 items-center gap-1 text-sm font-medium"
+              style={{ color: brand.forest }}
+            >
+              View All
+              <ArrowUpRight className="size-3.5" aria-hidden />
+            </Link>
+          </div>
         </div>
 
         {listings.length > 0 ? (

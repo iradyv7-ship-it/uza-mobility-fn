@@ -60,6 +60,7 @@ export type AdminPayment = {
   invoiceId: string;
   amountPaid: number;
   currency: string;
+  exchangeRateUsed?: number | null;
   bankName: string | null;
   transferReference: string | null;
   paymentDate: string | null;
@@ -108,6 +109,9 @@ export type AdminInvoice = {
   beneficiaryName?: string | null;
   bankName?: string | null;
   accountNumber?: string | null;
+  rwfBankName?: string | null;
+  rwfAccountNumber?: string | null;
+  exchangeRateUsed?: number | null;
   notes?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -151,6 +155,22 @@ export type OrderTrackingEvent = {
   occurredAt: string;
 };
 
+export type OrderShipment = {
+  id: string;
+  documentNumber?: string | null;
+  vesselName?: string | null;
+  voyageNumber?: string | null;
+  etaAt?: string | null;
+  portOfLoading?: string | null;
+  portOfDischarge?: string | null;
+  terminalOfPickup?: string | null;
+  finalPlaceOfDelivery?: string | null;
+  containerNumber?: string | null;
+  sealNumber?: string | null;
+  carrierTrackUrl?: string | null;
+  arrivalNoticeFileUrl?: string | null;
+};
+
 export type AdminOrder = {
   id: string;
   orderNumber: string;
@@ -159,6 +179,9 @@ export type AdminOrder = {
   invoiceId: string;
   status: OrderStatus;
   sellerType: SellerType;
+  vin?: string | null;
+  shipmentId?: string | null;
+  shipment?: OrderShipment | null;
   deliveryAddress: string | null;
   deliveryCity: string | null;
   deliveryCountry: string;
@@ -174,6 +197,7 @@ export type AdminOrder = {
     brand: string;
     model: string;
     manufacturingYear: number;
+    inventoryStage?: string | null;
   };
   invoice: {
     id: string;
@@ -181,6 +205,13 @@ export type AdminOrder = {
     paymentReference: string;
     totalAmountUsd: number;
   };
+  user?: {
+    id: string;
+    email: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    phone?: string | null;
+  } | null;
   trackingEvents: OrderTrackingEvent[];
 };
 

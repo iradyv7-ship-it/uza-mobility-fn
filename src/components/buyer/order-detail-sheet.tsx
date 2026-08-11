@@ -90,7 +90,63 @@ export function BuyerOrderDetailSheet({
                   }
                   fullWidth
                 />
+                {order.vin ? (
+                  <BuyerDetailRow label="VIN / chassis" value={order.vin} />
+                ) : null}
               </BuyerDetailSection>
+
+              {order.shipment ? (
+                <BuyerDetailSection title="Shipping">
+                  <BuyerDetailRow
+                    label="Container"
+                    value={order.shipment.containerNumber}
+                  />
+                  <BuyerDetailRow
+                    label="Document / BL"
+                    value={order.shipment.documentNumber}
+                  />
+                  <BuyerDetailRow
+                    label="Vessel / voyage"
+                    value={
+                      [order.shipment.vesselName, order.shipment.voyageNumber]
+                        .filter(Boolean)
+                        .join(' · ') || '—'
+                    }
+                  />
+                  <BuyerDetailRow
+                    label="ETA"
+                    value={formatDate(order.shipment.etaAt)}
+                  />
+                  <BuyerDetailRow
+                    label="Port / terminal"
+                    value={
+                      [
+                        order.shipment.portOfDischarge,
+                        order.shipment.terminalOfPickup,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ') || '—'
+                    }
+                    fullWidth
+                  />
+                  {order.shipment.carrierTrackUrl ? (
+                    <BuyerDetailRow
+                      label="Track shipment"
+                      value={
+                        <a
+                          href={order.shipment.carrierTrackUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={vehicleLinkClassName}
+                        >
+                          Open carrier tracking
+                        </a>
+                      }
+                      fullWidth
+                    />
+                  ) : null}
+                </BuyerDetailSection>
+              ) : null}
 
               <BuyerDetailSection title="Delivery">
                 <BuyerDetailRow

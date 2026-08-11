@@ -154,12 +154,16 @@ export function useUpdateBuyerProfile() {
   });
 }
 
-export function useMyOrders(filters: BuyerOrdersFilters = {}) {
-  const { accessToken, ready } = useBuyerAccessToken();
+export function useMyOrders(
+  filters: BuyerOrdersFilters = {},
+  extraEnabled = true,
+) {
+  const { accessToken, ready } = useBuyerAccessToken(extraEnabled);
   return useQuery({
     queryKey: buyerKeys.orders(filters),
     queryFn: () => getMyOrders(filters, accessToken),
     enabled: ready,
+    staleTime: 30_000,
   });
 }
 

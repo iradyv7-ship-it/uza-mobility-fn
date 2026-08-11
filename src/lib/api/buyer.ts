@@ -12,10 +12,10 @@ import { apiFetchPaginated } from '@/lib/api/api';
 import { siteConfig } from '@/config/site';
 import { getSession } from 'next-auth/react';
 import {
-  downloadInvoiceDocumentHtml,
+  downloadInvoiceDocumentPdf,
   fetchAuthenticatedInvoiceDocument,
   invoiceDocumentFilename,
-  openInvoiceDocumentInNewTab,
+  openInvoiceDocumentPdf,
 } from '@/lib/api/invoice-document';
 import { normalizeBuyerProfileBody } from '@/lib/buyer/profile-payload';
 import { toSearchParams } from '@/lib/api/query-params';
@@ -109,7 +109,7 @@ export function cancelMyInvoice(id: string) {
   });
 }
 
-async function fetchBuyerInvoiceDocumentHtml(invoiceId: string) {
+async function fetchBuyerInvoiceDocument(invoiceId: string) {
   const session = await getSession();
   const token = session?.accessToken;
   if (!token) throw new Error('Not authenticated');
@@ -121,16 +121,16 @@ async function fetchBuyerInvoiceDocumentHtml(invoiceId: string) {
 }
 
 export async function openInvoiceDocument(invoiceId: string) {
-  const html = await fetchBuyerInvoiceDocumentHtml(invoiceId);
-  openInvoiceDocumentInNewTab(html);
+  const blob = await fetchBuyerInvoiceDocument(invoiceId);
+  openInvoiceDocumentPdf(blob);
 }
 
 export async function downloadInvoiceDocument(
   invoiceId: string,
   invoiceNumber: string,
 ) {
-  const html = await fetchBuyerInvoiceDocumentHtml(invoiceId);
-  downloadInvoiceDocumentHtml(html, invoiceDocumentFilename(invoiceNumber));
+  const blob = await fetchBuyerInvoiceDocument(invoiceId);
+  downloadInvoiceDocumentPdf(blob, invoiceDocumentFilename(invoiceNumber));
 }
 
 export function getMyPayments(

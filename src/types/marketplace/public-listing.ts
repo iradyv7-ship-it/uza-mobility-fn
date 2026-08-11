@@ -88,6 +88,13 @@ export type PublicListing = {
   evSpecs?: PublicListingEvSpec | null;
   category?: PublicListingCategory | null;
   subcategory?: { id: string; name: string; slug: string } | null;
+  inventoryStage?:
+    | 'CHINA_UNPAID'
+    | 'IN_TRANSIT'
+    | 'AT_PORT'
+    | 'KIGALI_STOCK'
+    | null;
+  inventoryStageLabel?: string | null;
   displayBadge?: string | null;
   isBooked?: boolean;
   useCaseTags?: PublicListingUseCaseTag[];

@@ -33,9 +33,25 @@ export function formatListingPrice(listing: PublicListing): string {
   if (price == null) return 'Price on request';
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: listing.listingPricing?.currency ?? 'USD',
+    currency: 'USD',
     maximumFractionDigits: 0,
   }).format(price);
+}
+
+/** Format stored USD/USDT amount for public display (USDT label). */
+export function formatListingPriceUsdt(amountUsdt: number): string {
+  return `${new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 0,
+  }).format(amountUsdt)} USDT`;
+}
+
+export function formatListingPriceRwf(
+  amountUsdt: number,
+  usdToRwfEffective: number,
+): string {
+  return `${new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 0,
+  }).format(Math.round(amountUsdt * usdToRwfEffective))} Rwf`;
 }
 
 export function formatDrivetrainLabel(

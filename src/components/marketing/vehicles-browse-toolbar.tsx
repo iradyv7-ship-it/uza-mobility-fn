@@ -17,6 +17,7 @@ import {
   type VehiclesSearchParams,
 } from '@/lib/marketing/vehicles-browse';
 import { vehiclesHref } from '@/lib/marketing/vehicles-url';
+import { PriceCurrencyToggle } from '@/components/marketing/price-currency-provider';
 
 type VehiclesBrowseToolbarProps = {
   filters: VehiclesSearchParams;
@@ -61,6 +62,13 @@ export function VehiclesBrowseToolbar({ filters }: VehiclesBrowseToolbarProps) {
           />
         </label>
       </form>
+
+      <div className="flex shrink-0 flex-col gap-1.5">
+        <Label className="text-sm text-muted-foreground">Currency</Label>
+        <div className="flex h-11 items-center">
+          <PriceCurrencyToggle />
+        </div>
+      </div>
 
       <div className="flex shrink-0 flex-col gap-1.5 sm:w-52">
         <Label className="text-sm text-muted-foreground">Sort by</Label>

@@ -1,7 +1,12 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Car, Download, MapPin } from 'lucide-react';
 import { WishlistButton } from '@/components/marketing/wishlist-button';
+import { ListingPrice } from '@/components/marketing/listing-price';
+import { PriceCurrencyToggle } from '@/components/marketing/price-currency-provider';
+import { BuyerListingInteractionChip } from '@/components/marketing/buyer-listing-interaction-chip';
 import { VehicleDetailGallery } from '@/components/marketing/vehicle-detail-gallery';
 import { VehicleDetailBookingAction } from '@/components/marketing/vehicle-detail-booking-action';
 import { VehicleDetailSidebarSpecs } from '@/components/marketing/vehicle-detail-sidebar-specs';
@@ -14,12 +19,12 @@ import {
   getListingPhotos,
   resolveListingVideoUrl,
 } from '@/lib/marketing/listing-detail';
-import { formatListingPrice } from '@/lib/marketing/listing-display';
 import { brand } from '@/lib/marketing/colors';
 import {
   marketingContainer,
   marketingWhiteSurface,
 } from '@/lib/marketing/layout-classes';
+import { useBuyerListingInteraction } from '@/hooks/use-buyer-listing-interactions';
 import type { PublicListing } from '@/types/marketplace/public-listing';
 
 type VehicleDetailViewProps = {
@@ -30,6 +35,7 @@ export function VehicleDetailView({ listing }: VehicleDetailViewProps) {
   const photos = getListingPhotos(listing);
   const sidebarSpecs = buildVehicleSidebarSpecRows(listing);
   const extendedSpecGroups = buildVehicleExtendedSpecGroups(listing);
+  const buyerInteraction = useBuyerListingInteraction(listing.id);
 
   return (
     <div className={`${marketingWhiteSurface} py-8 sm:py-14`}>
@@ -80,24 +86,22 @@ export function VehicleDetailView({ listing }: VehicleDetailViewProps) {
 
           <div className="space-y-5 xl:sticky xl:top-24 xl:self-start">
             <div className="rounded-2xl border border-[#E9E9E9] p-4 sm:p-8">
-              <p className="text-sm font-medium" style={{ color: brand.teal }}>
-                The Price
-              </p>
+              <div className="flex items-start justify-between gap-3">
+                <p
+                  className="text-sm font-medium"
+                  style={{ color: brand.teal }}
+                >
+                  The Price
+                </p>
+                <PriceCurrencyToggle />
+              </div>
               <p className="mt-2 text-3xl font-semibold text-[#151515]">
-                {formatListingPrice(listing)}
+                <ListingPrice listing={listing} />
               </p>
 
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                {listing.displayBadge ? (
-                  <span
-                    className="rounded-full px-3 py-1 text-xs font-semibold"
-                    style={{
-                      backgroundColor: brand.lime,
-                      color: brand.forest,
-                    }}
-                  >
-                    {listing.displayBadge}
-                  </span>
+                {buyerInteraction ? (
+                  <BuyerListingInteractionChip interaction={buyerInteraction} />
                 ) : null}
                 {listing.isFullOption ? (
                   <span

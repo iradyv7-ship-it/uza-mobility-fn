@@ -1,15 +1,7 @@
 'use client';
 
+import { formatUsd } from '@/lib/format';
 import type { PriceBreakdown } from '@/types/pricing';
-
-function formatUsd(value: number | undefined) {
-  if (value == null || !Number.isFinite(value)) return '—';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-  }).format(value);
-}
 
 function formatDiscountLine(
   amount: number | undefined,

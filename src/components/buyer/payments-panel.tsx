@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { formatDate, formatUsd } from '@/lib/format';
+import { formatDate, formatSettledAmount, formatUsd } from '@/lib/format';
 import { useMyPayments } from '@/queries/buyer';
 import type {
   BuyerPayment,
@@ -136,7 +136,10 @@ export function BuyerPaymentsPanel() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {formatUsd(payment.amountPaid)} {payment.currency}
+                    {formatSettledAmount(payment.amountPaid, payment.currency)}
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      {payment.currency === 'RWF' ? 'Rwf' : 'USD'}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={payment.status} />

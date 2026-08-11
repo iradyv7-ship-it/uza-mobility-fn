@@ -22,13 +22,7 @@ import {
 import { useDeactivateSellerPart, useMyParts } from '@/queries/seller';
 import type { SellerPart } from '@/types/seller/marketplace';
 
-function formatUsd(value: number) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(value);
-}
+import { formatUsd } from '@/lib/format';
 
 export function SellerPartsPanel() {
   const canTrade = useSellerCanTrade();
