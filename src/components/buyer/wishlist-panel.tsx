@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
 import { ListingCard } from '@/components/marketing/listing-card';
-import { PriceCurrencyToggle } from '@/components/marketing/price-currency-provider';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { useWishlist } from '@/queries/wishlist';
@@ -51,9 +50,6 @@ export function BuyerWishlistPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
-        <PriceCurrencyToggle />
-      </div>
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {listings.map((listing) => (
           <ListingCard key={listing.id} listing={listing} />

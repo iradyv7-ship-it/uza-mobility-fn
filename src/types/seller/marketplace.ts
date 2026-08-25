@@ -24,6 +24,8 @@ export type SellerListingEvSpecs = {
 
 export type SellerListingPricing = {
   finalPriceUsd: number;
+  finalPriceRwf?: number | null;
+  displayPriceRwf?: number | null;
   currency: string;
   basePriceUsd?: number | null;
   fobPriceUsd?: number | null;
@@ -36,6 +38,17 @@ export type SellerListingPricing = {
   marginUsd?: number | null;
   landingCostUsd?: number | null;
   discountUsd?: number | null;
+  basePriceRwf?: number | null;
+  fobPriceRwf?: number | null;
+  sellerDesiredPayoutRwf?: number | null;
+  commissionRwf?: number | null;
+  shippingCostRwf?: number | null;
+  localChargesRwf?: number | null;
+  taxesEstimateRwf?: number | null;
+  insuranceRwf?: number | null;
+  marginRwf?: number | null;
+  landingCostRwf?: number | null;
+  discountRwf?: number | null;
 };
 
 export type SellerListing = {

@@ -24,8 +24,8 @@ const sellerListingFormFieldsSchema = z.object({
   mileageKm: z.number().min(0).optional(),
   rangeKm: z.number().min(1).optional(),
   batteryHealthPercent: z.number().min(0).max(100).optional(),
-  sellerDesiredPayoutUsd: z.number().min(0).optional(),
-  fobPriceUsd: z.number().min(0).optional(),
+  sellerDesiredPayoutRwf: z.number().min(0).optional(),
+  fobPriceRwf: z.number().min(0).optional(),
 });
 
 function refineSellerListingEvSpecs(
@@ -58,22 +58,22 @@ function refineSellerListingPricing(
 ) {
   if (
     data.sellerType === 'LOCAL_SELLER' &&
-    (data.sellerDesiredPayoutUsd == null || data.sellerDesiredPayoutUsd <= 0)
+    (data.sellerDesiredPayoutRwf == null || data.sellerDesiredPayoutRwf <= 0)
   ) {
     ctx.addIssue({
       code: 'custom',
-      message: 'Desired payout (USD) is required for local sellers',
-      path: ['sellerDesiredPayoutUsd'],
+      message: 'Desired payout (Rwf) is required for local sellers',
+      path: ['sellerDesiredPayoutRwf'],
     });
   }
   if (
     data.sellerType === 'INTERNATIONAL_SELLER' &&
-    (data.fobPriceUsd == null || data.fobPriceUsd <= 0)
+    (data.fobPriceRwf == null || data.fobPriceRwf <= 0)
   ) {
     ctx.addIssue({
       code: 'custom',
-      message: 'FOB price (USD) is required for international sellers',
-      path: ['fobPriceUsd'],
+      message: 'FOB price (Rwf) is required for international sellers',
+      path: ['fobPriceRwf'],
     });
   }
 }

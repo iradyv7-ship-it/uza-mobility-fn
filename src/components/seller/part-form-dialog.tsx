@@ -331,7 +331,7 @@ function PartPricingPreview({
   const debounced = useDebounce(priceUsd, 400);
   const preview = useQuery({
     queryKey: ['seller', 'part-pricing-preview', debounced],
-    queryFn: () => previewPartPricing({ desiredPayoutUsd: debounced! }),
+    queryFn: () => previewPartPricing({ desiredPayoutRwf: debounced! }),
     enabled: open && debounced != null && debounced > 0,
   });
 

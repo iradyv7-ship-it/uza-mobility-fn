@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { usePriceCurrency } from '@/components/marketing/price-currency-provider';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -30,9 +29,18 @@ import {
   invoiceLastRejectionReason,
   invoicePaymentWasRejected,
 } from '@/lib/buyer/invoice-flow';
-import { formatUsd, usdtToRwf } from '@/lib/format';
+import { formatInvoiceTotal, usdtToRwf } from '@/lib/format';
 import { useMyInvoices, useSubmitPayment } from '@/queries/buyer';
 import { submitPaymentSchema, type SubmitPaymentInput } from '@/schemas/buyer';
+
+function invoiceAmountRwf(invoice: {
+  totalAmountRwf?: number | null;
+  totalAmountUsd: number;
+  exchangeRateUsed?: number | null;
+}): number {
+  if (invoice.totalAmountRwf != null) return invoice.totalAmountRwf;
+  return usdtToRwf(invoice.totalAmountUsd, invoice.exchangeRateUsed) ?? 0;
+}
 
 type SubmitPaymentDialogProps = {
   open: boolean;
@@ -46,7 +54,6 @@ export function SubmitPaymentDialog({
   defaultInvoiceId,
 }: SubmitPaymentDialogProps) {
   const submit = useSubmitPayment();
-  const { rate } = usePriceCurrency();
   const { data: invoices } = useMyInvoices(
     { payableOnly: true, limit: 50 },
     open,
@@ -58,12 +65,10 @@ export function SubmitPaymentDialog({
     defaultValues: {
       invoiceId: defaultInvoiceId ?? '',
       amountPaid: 0,
-      currency: 'USD',
     },
   });
 
   const selectedInvoiceId = form.watch('invoiceId');
-  const paidCurrency = form.watch('currency');
   const selectedInvoice = invoices?.items.find(
     (invoice) => invoice.id === selectedInvoiceId,
   );
@@ -74,18 +79,6 @@ export function SubmitPaymentDialog({
     ? invoiceLastRejectionReason(selectedInvoice)
     : null;
 
-  const effectiveRate =
-    selectedInvoice?.exchangeRateUsed ?? rate?.usdToRwfEffective ?? null;
-
-  const syncAmountForCurrency = (currency: 'USD' | 'RWF', totalUsd: number) => {
-    if (currency === 'RWF') {
-      const rwf = usdtToRwf(totalUsd, effectiveRate);
-      form.setValue('amountPaid', rwf ?? 0);
-      return;
-    }
-    form.setValue('amountPaid', totalUsd);
-  };
-
   useEffect(() => {
     if (!open) return;
     const invoice =
@@ -93,8 +86,7 @@ export function SubmitPaymentDialog({
       invoices?.items[0];
     form.reset({
       invoiceId: defaultInvoiceId ?? invoice?.id ?? '',
-      amountPaid: invoice?.totalAmountUsd ?? 0,
-      currency: 'USD',
+      amountPaid: invoice ? invoiceAmountRwf(invoice) : 0,
       transferReference: invoice?.paymentReference ?? '',
     });
     setProofs([]);
@@ -103,20 +95,19 @@ export function SubmitPaymentDialog({
 
   useEffect(() => {
     if (!selectedInvoice) return;
-    const currency = form.getValues('currency') ?? 'USD';
-    syncAmountForCurrency(currency, selectedInvoice.totalAmountUsd);
+    form.setValue('amountPaid', invoiceAmountRwf(selectedInvoice));
     if (!form.getValues('transferReference')) {
       form.setValue('transferReference', selectedInvoice.paymentReference);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedInvoice?.id, effectiveRate]);
+  }, [selectedInvoice?.id]);
 
   const onSubmit = form.handleSubmit((values) => {
     submit.mutate(
       { body: values, proofs },
       {
         onSuccess: () => {
-          form.reset({ invoiceId: '', amountPaid: 0, currency: 'USD' });
+          form.reset({ invoiceId: '', amountPaid: 0 });
           setProofs([]);
           onOpenChange(false);
         },
@@ -151,7 +142,7 @@ export function SubmitPaymentDialog({
               <SelectContent>
                 {invoices?.items.map((inv) => (
                   <SelectItem key={inv.id} value={inv.id}>
-                    {inv.invoiceNumber} · {formatUsd(inv.totalAmountUsd)} ·{' '}
+                    {inv.invoiceNumber} · {formatInvoiceTotal(inv)} ·{' '}
                     {inv.status.replaceAll('_', ' ').toLowerCase()}
                   </SelectItem>
                 ))}
@@ -165,46 +156,20 @@ export function SubmitPaymentDialog({
           </div>
           {selectedInvoice ? (
             <p className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
-              Use payment reference{' '}
+              Pay the Rwf account using payment reference{' '}
               <span className="font-mono">
                 {selectedInvoice.paymentReference}
-              </span>{' '}
-              when transferring funds.
+              </span>
+              .
             </p>
           ) : null}
-          <div className="space-y-1.5">
-            <Label>Paid to account</Label>
-            <Select
-              value={paidCurrency}
-              onValueChange={(value) => {
-                const currency = value === 'RWF' ? 'RWF' : 'USD';
-                form.setValue('currency', currency);
-                if (selectedInvoice) {
-                  syncAmountForCurrency(
-                    currency,
-                    selectedInvoice.totalAmountUsd,
-                  );
-                }
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select account" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="USD">USD receiving account</SelectItem>
-                <SelectItem value="RWF">Rwf receiving account</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="amount">
-                Amount paid ({paidCurrency === 'RWF' ? 'Rwf' : 'USD'})
-              </Label>
+              <Label htmlFor="amount">Amount paid (Rwf)</Label>
               <NumberInput
                 id="amount"
                 min={0}
-                step="0.01"
+                step="1"
                 {...form.register('amountPaid', numberRegisterOptions())}
               />
             </div>

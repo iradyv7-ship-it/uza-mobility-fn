@@ -1,4 +1,5 @@
 import { siteConfig } from '@/config/site';
+import { formatListingPrice as formatPricing } from '@/lib/format';
 import type { PublicListing } from '@/types/marketplace/public-listing';
 
 /** Normalize API photo URLs for next/image (proxied /uploads + legacy Cloudinary). */
@@ -29,13 +30,7 @@ export function getListingPrimaryPhoto(listing: PublicListing): string | null {
   return resolveMediaUrl(primary?.url ?? null);
 }
 export function formatListingPrice(listing: PublicListing): string {
-  const price = listing.listingPricing?.finalPriceUsd;
-  if (price == null) return 'Price on request';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(price);
+  return formatPricing(listing.listingPricing);
 }
 
 /** Format stored USD/USDT amount for public display (USDT label). */

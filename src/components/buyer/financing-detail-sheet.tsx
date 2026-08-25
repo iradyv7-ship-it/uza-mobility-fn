@@ -12,7 +12,7 @@ import {
   BuyerDetailSummary,
 } from '@/components/buyer/detail-sheet-layout';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { formatDateTime, formatUsd } from '@/lib/format';
+import { formatDateTime, formatInvoiceTotal, formatUsd } from '@/lib/format';
 import { buyerDetailSheetClassName } from '@/lib/buyer/detail-sheet';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import type { BuyerFinancingRequest } from '@/types/buyer/commerce';
@@ -81,7 +81,7 @@ export function BuyerFinancingDetailSheet({
               />
               <BuyerDetailRow
                 label="Amount"
-                value={formatUsd(request.invoice.totalAmountUsd)}
+                value={formatInvoiceTotal(request.invoice)}
               />
               <BuyerDetailRow
                 label="Invoice status"

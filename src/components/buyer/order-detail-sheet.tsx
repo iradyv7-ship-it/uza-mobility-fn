@@ -14,7 +14,7 @@ import {
 } from '@/components/buyer/detail-sheet-layout';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { formatDate, formatDateTime, formatUsd } from '@/lib/format';
+import { formatDate, formatDateTime, formatInvoiceTotal } from '@/lib/format';
 import { formatSellerChannel } from '@/lib/auth/seller-profiles';
 import { buyerDetailSheetClassName } from '@/lib/buyer/detail-sheet';
 import { useOrderTracking } from '@/queries/buyer';
@@ -54,7 +54,7 @@ export function BuyerOrderDetailSheet({
                 items={[
                   {
                     label: 'Total paid',
-                    value: formatUsd(order.invoice.totalAmountUsd),
+                    value: formatInvoiceTotal(order.invoice),
                     emphasis: true,
                   },
                   {

@@ -22,7 +22,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { workspaceRoutes } from '@/config/routes';
-import { formatUsd } from '@/lib/format';
+import { formatInvoiceTotal } from '@/lib/format';
 import {
   invoiceLastRejectionReason,
   invoicePaymentWasRejected,
@@ -198,7 +198,7 @@ export function BuyerInvoicesPanel() {
                   <TableCell>
                     <StatusBadge status={invoice.status} />
                   </TableCell>
-                  <TableCell>{formatUsd(invoice.totalAmountUsd)}</TableCell>
+                  <TableCell>{formatInvoiceTotal(invoice)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex flex-wrap justify-end gap-2">
                       <Button

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Car, Download, MapPin } from 'lucide-react';
 import { WishlistButton } from '@/components/marketing/wishlist-button';
 import { ListingPrice } from '@/components/marketing/listing-price';
-import { PriceCurrencyToggle } from '@/components/marketing/price-currency-provider';
 import { BuyerListingInteractionChip } from '@/components/marketing/buyer-listing-interaction-chip';
 import { VehicleDetailGallery } from '@/components/marketing/vehicle-detail-gallery';
 import { VehicleDetailBookingAction } from '@/components/marketing/vehicle-detail-booking-action';
@@ -93,7 +92,6 @@ export function VehicleDetailView({ listing }: VehicleDetailViewProps) {
                 >
                   The Price
                 </p>
-                <PriceCurrencyToggle />
               </div>
               <p className="mt-2 text-3xl font-semibold text-[#151515]">
                 <ListingPrice listing={listing} />

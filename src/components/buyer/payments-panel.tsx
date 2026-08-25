@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { formatDate, formatSettledAmount, formatUsd } from '@/lib/format';
+import { formatDate, formatSettledAmount } from '@/lib/format';
 import { useMyPayments } from '@/queries/buyer';
 import type {
   BuyerPayment,

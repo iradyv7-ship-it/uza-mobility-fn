@@ -119,8 +119,8 @@ export function SellerListingFormDialog({
 
   const sellerType = form.watch('sellerType');
   const condition = form.watch('condition');
-  const payout = form.watch('sellerDesiredPayoutUsd');
-  const fob = form.watch('fobPriceUsd');
+  const payout = form.watch('sellerDesiredPayoutRwf');
+  const fob = form.watch('fobPriceRwf');
   const country = form.watch('country');
   const debouncedPayout = useDebounce(payout, 400);
   const debouncedFob = useDebounce(fob, 400);
@@ -138,9 +138,9 @@ export function SellerListingFormDialog({
     queryFn: () =>
       previewListingPricing({
         country,
-        sellerDesiredPayoutUsd:
+        sellerDesiredPayoutRwf:
           sellerType === 'LOCAL_SELLER' ? debouncedPayout : undefined,
-        fobPriceUsd:
+        fobPriceRwf:
           sellerType === 'INTERNATIONAL_SELLER' ? debouncedFob : undefined,
       }),
     enabled:
@@ -380,7 +380,7 @@ export function SellerListingFormDialog({
           {sellerType === 'LOCAL_SELLER' ? (
             <div className="space-y-2">
               <div className="space-y-1.5">
-                <Label htmlFor="payout">Desired payout after sale (USD)</Label>
+                <Label htmlFor="payout">Desired payout after sale (Rwf)</Label>
                 <p className="text-xs text-muted-foreground">
                   Amount you want to receive; platform fees are added for the
                   buyer price shown on the marketplace.
@@ -388,15 +388,15 @@ export function SellerListingFormDialog({
                 <NumberInput
                   id="payout"
                   min={0}
-                  step="0.01"
+                  step="1"
                   {...form.register(
-                    'sellerDesiredPayoutUsd',
+                    'sellerDesiredPayoutRwf',
                     numberRegisterOptions(),
                   )}
                 />
-                {form.formState.errors.sellerDesiredPayoutUsd ? (
+                {form.formState.errors.sellerDesiredPayoutRwf ? (
                   <p className="text-sm text-destructive">
-                    {form.formState.errors.sellerDesiredPayoutUsd.message}
+                    {form.formState.errors.sellerDesiredPayoutRwf.message}
                   </p>
                 ) : null}
               </div>
@@ -409,7 +409,7 @@ export function SellerListingFormDialog({
           ) : (
             <div className="space-y-2">
               <div className="space-y-1.5">
-                <Label htmlFor="fob-price">FOB price (USD)</Label>
+                <Label htmlFor="fob-price">FOB price (Rwf)</Label>
                 <p className="text-xs text-muted-foreground">
                   Free-on-board cost; shipping, taxes, and platform margin are
                   added for the buyer price.
@@ -417,12 +417,12 @@ export function SellerListingFormDialog({
                 <NumberInput
                   id="fob-price"
                   min={0}
-                  step="0.01"
-                  {...form.register('fobPriceUsd', numberRegisterOptions())}
+                  step="1"
+                  {...form.register('fobPriceRwf', numberRegisterOptions())}
                 />
-                {form.formState.errors.fobPriceUsd ? (
+                {form.formState.errors.fobPriceRwf ? (
                   <p className="text-sm text-destructive">
-                    {form.formState.errors.fobPriceUsd.message}
+                    {form.formState.errors.fobPriceRwf.message}
                   </p>
                 ) : null}
               </div>

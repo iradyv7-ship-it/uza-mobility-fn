@@ -18,8 +18,8 @@ import { Button } from '@/components/ui/button';
 import {
   formatDate,
   formatDateTime,
+  formatInvoiceTotal,
   formatSettledAmount,
-  formatUsd,
 } from '@/lib/format';
 import { invoiceStatusHintFor } from '@/lib/buyer/invoice-flow';
 import { buyerDetailSheetClassName } from '@/lib/buyer/detail-sheet';
@@ -71,7 +71,7 @@ export function BuyerInvoiceDetailSheet({
             items={[
               {
                 label: 'Amount due',
-                value: `${formatUsd(invoice.totalAmountUsd)} ${invoice.currency}`,
+                value: formatInvoiceTotal(invoice),
                 emphasis: true,
               },
               {
@@ -123,10 +123,11 @@ export function BuyerInvoiceDetailSheet({
                 label="Beneficiary"
                 value={invoice.beneficiaryName}
               />
-              <BuyerDetailRow
-                label="USD account"
-                value={
-                  invoice.bankName || invoice.accountNumber ? (
+              {invoice.currency === 'USD' &&
+              (invoice.bankName || invoice.accountNumber) ? (
+                <BuyerDetailRow
+                  label="USD account"
+                  value={
                     <span>
                       {invoice.bankName ?? '—'}
                       {invoice.accountNumber ? (
@@ -135,16 +136,14 @@ export function BuyerInvoiceDetailSheet({
                         </span>
                       ) : null}
                     </span>
-                  ) : (
-                    '—'
-                  )
-                }
-                fullWidth
-              />
-              <BuyerDetailRow
-                label="Rwf account"
-                value={
-                  invoice.rwfBankName || invoice.rwfAccountNumber ? (
+                  }
+                  fullWidth
+                />
+              ) : null}
+              {invoice.rwfBankName || invoice.rwfAccountNumber ? (
+                <BuyerDetailRow
+                  label="Rwf account"
+                  value={
                     <span>
                       {invoice.rwfBankName ?? '—'}
                       {invoice.rwfAccountNumber ? (
@@ -153,12 +152,10 @@ export function BuyerInvoiceDetailSheet({
                         </span>
                       ) : null}
                     </span>
-                  ) : (
-                    '—'
-                  )
-                }
-                fullWidth
-              />
+                  }
+                  fullWidth
+                />
+              ) : null}
             </BuyerDetailSection>
           )}
 

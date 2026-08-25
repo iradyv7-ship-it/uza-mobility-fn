@@ -1,15 +1,17 @@
 'use client';
 
-import { formatUsd } from '@/lib/format';
+import { formatRwf } from '@/lib/format';
 import type { PriceBreakdown } from '@/types/pricing';
 
-function formatDiscountLine(
+function formatAmountWithPercent(
   amount: number | undefined,
   ratePercent?: number,
 ): string {
-  const formatted = formatUsd(amount);
+  const formatted = formatRwf(amount);
   if (ratePercent != null && ratePercent > 0) {
-    return `${formatted} (${ratePercent}%)`;
+    const displayRate =
+      ratePercent % 1 === 0 ? ratePercent.toFixed(0) : ratePercent.toFixed(2);
+    return `${formatted} (${displayRate}%)`;
   }
   return formatted;
 }
@@ -28,7 +30,7 @@ function Line({
       className={`flex justify-between gap-4 text-sm ${emphasis ? 'font-medium' : ''}`}
     >
       <span className="text-muted-foreground">{label}</span>
-      <span>{value}</span>
+      <span className="text-right">{value}</span>
     </div>
   );
 }
@@ -36,7 +38,7 @@ function Line({
 type PricingBreakdownProps = {
   breakdown: PriceBreakdown | null | undefined;
   loading?: boolean;
-  sellerType?: 'LOCAL_SELLER' | 'INTERNATIONAL_SELLER' | string;
+  sellerType?: string;
 };
 
 export function PricingBreakdown({
@@ -55,94 +57,73 @@ export function PricingBreakdown({
   }
 
   const type = sellerType ?? breakdown.sellerType;
-  const showRuleDiscount =
-    (breakdown.ruleDiscountUsd ?? 0) > 0 ||
+  const showDiscount =
+    (breakdown.ruleDiscountRwf ?? 0) > 0 ||
     breakdown.ruleDiscountRatePercent != null;
-  const showListingDiscount = (breakdown.discountUsd ?? 0) > 0;
+
+  const discountLine = showDiscount ? (
+    <Line
+      label="Discount"
+      value={formatAmountWithPercent(
+        breakdown.ruleDiscountRwf,
+        breakdown.ruleDiscountRatePercent,
+      )}
+    />
+  ) : null;
+
+  const listPriceLine = (
+    <Line
+      label="Buyer pays (list price)"
+      value={formatRwf(breakdown.finalPriceRwf)}
+      emphasis
+    />
+  );
 
   return (
     <div className="space-y-2 rounded-lg border bg-muted/30 p-3">
       <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-        Price estimate (from current platform rules)
+        Buyer price breakdown
       </p>
       {type === 'LOCAL_SELLER' ? (
         <>
           <Line
-            label="Your payout"
-            value={formatUsd(breakdown.sellerDesiredPayoutUsd)}
+            label="Seller payout"
+            value={formatRwf(breakdown.sellerDesiredPayoutRwf)}
           />
           <Line
             label="Platform commission"
-            value={formatUsd(breakdown.commissionUsd)}
+            value={formatRwf(breakdown.commissionRwf)}
           />
-          {showRuleDiscount ? (
-            <Line
-              label="Rule discount"
-              value={formatDiscountLine(
-                breakdown.ruleDiscountUsd,
-                breakdown.ruleDiscountRatePercent,
-              )}
-            />
-          ) : null}
-          {showListingDiscount ? (
-            <Line
-              label="Listing discount"
-              value={formatUsd(breakdown.discountUsd)}
-            />
-          ) : null}
-          <Line
-            label="Buyer pays (list price)"
-            value={formatUsd(breakdown.finalPriceUsd)}
-            emphasis
-          />
+          {discountLine}
+          {listPriceLine}
         </>
       ) : type === 'INTERNATIONAL_SELLER' ? (
         <>
-          <Line label="FOB price" value={formatUsd(breakdown.fobPriceUsd)} />
-          <Line label="Shipping" value={formatUsd(breakdown.shippingCostUsd)} />
+          <Line label="FOB price" value={formatRwf(breakdown.fobPriceRwf)} />
+          <Line label="Shipping" value={formatRwf(breakdown.shippingCostRwf)} />
           <Line
             label="Local charges"
-            value={formatUsd(breakdown.localChargesUsd)}
+            value={formatRwf(breakdown.localChargesRwf)}
           />
           <Line
             label="Taxes (est.)"
-            value={formatUsd(breakdown.taxesEstimateUsd)}
+            value={formatRwf(breakdown.taxesEstimateRwf)}
           />
-          <Line
-            label="Platform margin"
-            value={formatUsd(breakdown.marginUsd)}
-          />
-          {showRuleDiscount ? (
+          {breakdown.marginRwf != null ? (
             <Line
-              label="Rule discount"
-              value={formatDiscountLine(
-                breakdown.ruleDiscountUsd,
-                breakdown.ruleDiscountRatePercent,
+              label="Platform margin"
+              value={formatAmountWithPercent(
+                breakdown.marginRwf,
+                breakdown.platformMarginRatePercent,
               )}
             />
           ) : null}
-          {showListingDiscount ? (
-            <Line
-              label="Listing discount"
-              value={formatUsd(breakdown.discountUsd)}
-            />
-          ) : null}
-          <Line
-            label="Buyer pays (list price)"
-            value={formatUsd(breakdown.finalPriceUsd)}
-            emphasis
-          />
+          {discountLine}
+          {listPriceLine}
         </>
       ) : (
-        <Line
-          label="Buyer pays (list price)"
-          value={formatUsd(breakdown.finalPriceUsd)}
-          emphasis
-        />
+        listPriceLine
       )}
-      <p className="text-xs text-muted-foreground">
-        Final numbers are fixed when an administrator approves the listing.
-      </p>
     </div>
   );
 }

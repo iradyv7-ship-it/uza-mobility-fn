@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { formatUsd } from '@/lib/format';
+import { formatInvoiceTotal } from '@/lib/format';
 import { useMyOrders } from '@/queries/buyer';
 import type { BuyerOrder, BuyerOrdersFilters } from '@/types/buyer/commerce';
 
@@ -83,7 +83,7 @@ export function BuyerOrdersPanel() {
                 <TableCell>
                   <StatusBadge status={order.status} />
                 </TableCell>
-                <TableCell>{formatUsd(order.invoice.totalAmountUsd)}</TableCell>
+                <TableCell>{formatInvoiceTotal(order.invoice)}</TableCell>
                 <TableCell className="text-right">
                   <Button
                     size="sm"

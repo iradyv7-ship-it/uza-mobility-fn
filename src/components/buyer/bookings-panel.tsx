@@ -10,7 +10,7 @@ import { SubmitBookingPaymentDialog } from '@/components/buyer/submit-booking-pa
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { formatUsd } from '@/lib/format';
+import { formatBookingFee } from '@/lib/format';
 import { workspaceRoutes } from '@/config/routes';
 import {
   bookingPaymentWasRejected,
@@ -109,7 +109,7 @@ export function BuyerBookingsPanel() {
                 </p>
 
                 <p className="text-sm text-muted-foreground">
-                  {formatUsd(booking.bookingFeeUsd)} · {booking.bookingNumber}
+                  {formatBookingFee(booking)} · {booking.bookingNumber}
                 </p>
 
                 {hint ? (

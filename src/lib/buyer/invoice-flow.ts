@@ -140,6 +140,8 @@ export function publicListingToSummary(listing: {
   status: string;
   listingPricing?: {
     finalPriceUsd: number;
+    finalPriceRwf?: number | null;
+    displayPriceRwf?: number | null;
     currency: string;
   } | null;
 }) {

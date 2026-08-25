@@ -7,7 +7,7 @@ import { authenticatedMultipartFetch } from '@/lib/api/multipart';
 import type { VehicleBooking } from '@/types/buyer/bookings';
 
 export function getBookingFeeQuote() {
-  return apiFetch<{ bookingFeeUsd: number; currency: 'USD' }>('/bookings/fee');
+  return apiFetch<{ bookingFeeRwf: number; currency: 'RWF' }>('/bookings/fee');
 }
 
 export function requestVehicleBooking(body: {

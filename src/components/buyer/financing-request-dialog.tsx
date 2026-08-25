@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { formatUsd } from '@/lib/format';
+import { formatListingPrice, formatUsd } from '@/lib/format';
 import { useSessionUser } from '@/hooks/session-user';
 import { useMyInvoices, useSubmitFinancing } from '@/queries/buyer';
 import {
@@ -148,7 +148,7 @@ export function FinancingRequestDialog({
               </p>
               {selectedListing.listingPricing?.finalPriceUsd != null ? (
                 <p className="text-muted-foreground">
-                  {formatUsd(selectedListing.listingPricing.finalPriceUsd)}
+                  {formatListingPrice(selectedListing.listingPricing)}
                 </p>
               ) : null}
             </div>

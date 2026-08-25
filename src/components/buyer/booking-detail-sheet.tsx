@@ -15,10 +15,10 @@ import {
 } from '@/components/buyer/detail-sheet-layout';
 import { StatusBadge } from '@/components/shared/status-badge';
 import {
+  formatBookingFee,
   formatDate,
   formatDateTime,
   formatSettledAmount,
-  formatUsd,
 } from '@/lib/format';
 import { formatSellerChannel } from '@/lib/auth/seller-profiles';
 import { buyerDetailSheetClassName } from '@/lib/buyer/detail-sheet';
@@ -63,7 +63,7 @@ export function BuyerBookingDetailSheet({
             items={[
               {
                 label: 'Booking fee',
-                value: formatUsd(booking.bookingFeeUsd),
+                value: formatBookingFee(booking),
                 emphasis: true,
               },
               {

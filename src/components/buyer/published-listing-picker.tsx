@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { SearchablePicker } from '@/components/shared/searchable-picker';
 import type { SearchablePickerOption } from '@/components/shared/searchable-picker';
-import { formatUsd } from '@/lib/format';
+import { formatListingPrice } from '@/lib/format';
 import { useDebounce } from '@/hooks/use-debounce';
 import { PUBLIC_LISTINGS_PAGE_LIMIT } from '@/lib/api/buyer';
 import { usePublishedListings } from '@/queries/buyer';
@@ -12,14 +12,14 @@ import type { PublicListingSummary } from '@/types/buyer/commerce';
 export function publishedListingToOption(
   listing: PublicListingSummary,
 ): SearchablePickerOption {
-  const price = listing.listingPricing?.finalPriceUsd;
+  const price = formatListingPrice(listing.listingPricing);
   return {
     value: listing.id,
     label: listing.listingTitle,
     hint: [
       `${listing.brand} ${listing.model}`,
       listing.manufacturingYear,
-      price != null ? formatUsd(price) : null,
+      price !== 'Price on request' ? price : null,
     ]
       .filter(Boolean)
       .join(' · '),

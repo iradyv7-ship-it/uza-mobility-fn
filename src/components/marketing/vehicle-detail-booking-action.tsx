@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { workspaceRoutes } from '@/config/routes';
 import { brand } from '@/lib/marketing/colors';
-import { usePriceCurrency } from '@/components/marketing/price-currency-provider';
+import { formatBookingFee, formatInvoiceTotal, formatListingPrice, formatRwf } from '@/lib/format';
 import {
   bookingPaymentWasRejected,
   bookingStatusHint,
@@ -56,7 +56,6 @@ export function VehicleDetailBookingAction({
 }: VehicleDetailBookingActionProps) {
   const router = useAppRouter();
   const { data: session, status } = useSession();
-  const { formatAmount } = usePriceCurrency();
   const me = isMeUser(session?.user) ? session.user : null;
   const isAuthenticatedBuyer =
     status === 'authenticated' && Boolean(me?.roles.includes('BUYER'));
@@ -201,7 +200,7 @@ export function VehicleDetailBookingAction({
               </p>
             ) : null}
             <p className="mt-2 text-[#356769]">
-              Booking fee: {formatAmount(activeBooking.bookingFeeUsd)}
+              Booking fee: {formatBookingFee(activeBooking)}
             </p>
           </div>
           {isBookingPaymentSubmittable(activeBooking) ? (
@@ -287,7 +286,7 @@ export function VehicleDetailBookingAction({
             </p>
           ) : null}
           <p className="mt-2 text-[#356769]">
-            Amount: {formatAmount(activeInvoice.totalAmountUsd)}
+            Amount: {formatInvoiceTotal(activeInvoice)}
           </p>
         </div>
         <Button
@@ -372,10 +371,7 @@ export function VehicleDetailBookingAction({
     );
   };
 
-  const priceLabel =
-    listing.listingPricing?.finalPriceUsd != null
-      ? formatAmount(listing.listingPricing.finalPriceUsd)
-      : 'the quoted price';
+  const priceLabel = formatListingPrice(listing.listingPricing);
 
   return (
     <div className="mt-8 space-y-2">
@@ -401,7 +397,7 @@ export function VehicleDetailBookingAction({
       <p className="text-center text-xs text-[#356769]">
         Buy requests a proforma invoice for {priceLabel} and lets you upload
         payment proof. Book secures the vehicle with a{' '}
-        {feeQuote ? formatAmount(feeQuote.bookingFeeUsd) : 'small'} booking fee.
+        {feeQuote ? formatRwf(feeQuote.bookingFeeRwf) : 'small'} booking fee.
       </p>
     </div>
   );

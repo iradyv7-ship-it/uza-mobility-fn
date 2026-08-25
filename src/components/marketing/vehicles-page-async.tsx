@@ -1,6 +1,5 @@
 import { ListingCard } from '@/components/marketing/listing-card';
 import { VehiclesBrowseToolbar } from '@/components/marketing/vehicles-browse-toolbar';
-import { PriceCurrencyToggle } from '@/components/marketing/price-currency-provider';
 import { VehiclesFiltersSidebar } from '@/components/marketing/vehicles-filters-sidebar';
 import { VehiclesHero } from '@/components/marketing/vehicles-hero';
 import { VehiclesPagination } from '@/components/marketing/vehicles-pagination';
@@ -99,14 +98,7 @@ export async function VehiclesPageAsync({
         <div className={`${marketingContainer} py-10 sm:py-14 lg:py-[60px]`}>
           {!isLocalStock ? (
             <VehiclesBrowseToolbar filters={filters} />
-          ) : (
-            <div className="mb-8 flex justify-end">
-              <div className="flex flex-col gap-1.5">
-                <span className="text-sm text-muted-foreground">Currency</span>
-                <PriceCurrencyToggle />
-              </div>
-            </div>
-          )}
+          ) : null}
 
           <div className="flex flex-col gap-8 max-lg:flex-col-reverse lg:flex-row lg:items-start lg:gap-8">
             {!isLocalStock ? (

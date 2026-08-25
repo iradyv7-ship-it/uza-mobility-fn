@@ -16,8 +16,8 @@ import { StatusBadge } from '@/components/shared/status-badge';
 import {
   formatDate,
   formatDateTime,
+  formatInvoiceTotal,
   formatSettledAmount,
-  formatUsd,
 } from '@/lib/format';
 import { buyerDetailSheetClassName } from '@/lib/buyer/detail-sheet';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -66,7 +66,7 @@ export function BuyerPaymentDetailSheet({
               },
               {
                 label: 'Invoice total',
-                value: formatUsd(payment.invoice.totalAmountUsd),
+                value: formatInvoiceTotal(payment.invoice),
               },
               {
                 label: 'Submitted',

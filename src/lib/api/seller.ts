@@ -17,13 +17,13 @@ import type { SellerListing, SellerPart } from '@/types/seller/marketplace';
 
 export type ListingPricingPreviewInput = {
   country?: string;
-  sellerDesiredPayoutUsd?: number;
-  fobPriceUsd?: number;
-  discountUsd?: number;
+  sellerDesiredPayoutRwf?: number;
+  fobPriceRwf?: number;
+  discountRwf?: number;
 };
 
 export type PartPricingPreviewInput = {
-  desiredPayoutUsd: number;
+  desiredPayoutRwf: number;
 };
 
 export function getMyListings() {

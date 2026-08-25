@@ -25,6 +25,8 @@ export type PublicListingEvSpec = {
 
 export type PublicListingPricing = {
   finalPriceUsd: number;
+  finalPriceRwf?: number | null;
+  displayPriceRwf?: number | null;
   currency: string;
 };
 

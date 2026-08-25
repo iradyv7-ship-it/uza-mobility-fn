@@ -32,7 +32,7 @@ import {
 } from '@/queries/seller';
 import type { SellerListing } from '@/types/seller/marketplace';
 
-import { formatUsd } from '@/lib/format';
+import { formatListingPrice } from '@/lib/format';
 
 export function SellerListingsPanel() {
   const canTrade = useSellerCanTrade();
@@ -125,7 +125,7 @@ export function SellerListingsPanel() {
                   <StatusBadge status={listing.status} />
                 </TableCell>
                 <TableCell>
-                  {formatUsd(listing.listingPricing?.finalPriceUsd)}
+                  {formatListingPrice(listing.listingPricing)}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {new Date(listing.updatedAt).toLocaleDateString()}

@@ -14,6 +14,7 @@ export type VehicleBooking = {
   listingId: string;
   userId: string;
   bookingFeeUsd: number;
+  bookingFeeRwf?: number | null;
   currency: string;
   status: VehicleBookingStatus;
   amountPaid?: number | null;
@@ -46,6 +47,6 @@ export type VehicleBooking = {
 };
 
 export type BookingFeeQuote = {
-  bookingFeeUsd: number;
-  currency: 'USD';
+  bookingFeeRwf: number;
+  currency: 'RWF';
 };

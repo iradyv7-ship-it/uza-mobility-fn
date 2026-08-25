@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { PaymentProofFileInput } from '@/components/buyer/payment-proof-file-input';
-import { usePriceCurrency } from '@/components/marketing/price-currency-provider';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -13,17 +12,15 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { NumberInput } from '@/components/ui/number-input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { bookingPaymentWasRejected } from '@/lib/buyer/booking-flow';
-import { formatUsd, usdtToRwf } from '@/lib/format';
+import { formatBookingFee, usdtToRwf } from '@/lib/format';
 import { useSubmitBookingPayment } from '@/queries/bookings';
 import type { VehicleBooking } from '@/types/buyer/bookings';
+
+function bookingFeeRwf(booking: VehicleBooking): number {
+  if (booking.bookingFeeRwf != null) return booking.bookingFeeRwf;
+  return usdtToRwf(booking.bookingFeeUsd) ?? booking.bookingFeeUsd;
+}
 
 type SubmitBookingPaymentDialogProps = {
   open: boolean;
@@ -37,37 +34,18 @@ export function SubmitBookingPaymentDialog({
   booking,
 }: SubmitBookingPaymentDialogProps) {
   const submit = useSubmitBookingPayment();
-  const { rate } = usePriceCurrency();
   const [proofs, setProofs] = useState<File[]>([]);
-  const [currency, setCurrency] = useState<'USD' | 'RWF'>('USD');
   const [amountPaid, setAmountPaid] = useState('');
-
-  const effectiveRate = rate?.usdToRwfEffective ?? null;
-  const expectedRwf =
-    booking != null ? usdtToRwf(booking.bookingFeeUsd, effectiveRate) : null;
 
   useEffect(() => {
     if (!open || !booking) {
       setProofs([]);
-      setCurrency('USD');
       setAmountPaid('');
       return;
     }
-    setCurrency('USD');
-    setAmountPaid(String(booking.bookingFeeUsd));
+    setAmountPaid(String(bookingFeeRwf(booking)));
     setProofs([]);
-  }, [open, booking?.id, booking?.bookingFeeUsd]);
-
-  const onCurrencyChange = (value: string) => {
-    const next = value === 'RWF' ? 'RWF' : 'USD';
-    setCurrency(next);
-    if (!booking) return;
-    if (next === 'RWF') {
-      setAmountPaid(String(expectedRwf ?? 0));
-      return;
-    }
-    setAmountPaid(String(booking.bookingFeeUsd));
-  };
+  }, [open, booking?.id, booking?.bookingFeeUsd, booking?.bookingFeeRwf]);
 
   const onSubmit = () => {
     if (!booking || proofs.length === 0) return;
@@ -79,7 +57,6 @@ export function SubmitBookingPaymentDialog({
         bookingId: booking.id,
         payload: {
           amountPaid: parsed,
-          currency,
           transferReference: booking.paymentReference,
         },
         proofs,
@@ -124,36 +101,20 @@ export function SubmitBookingPaymentDialog({
                 {booking.listing?.listingTitle ?? booking.bookingNumber}
               </p>
               <p className="mt-1 text-muted-foreground">
-                Booking fee: {formatUsd(booking.bookingFeeUsd)}
+                Booking fee: {formatBookingFee(booking)}
               </p>
               <p className="mt-2 text-xs text-muted-foreground">
-                Use payment reference{' '}
-                <span className="font-mono">{booking.paymentReference}</span>{' '}
-                when transferring funds.
+                Pay the Rwf account using payment reference{' '}
+                <span className="font-mono">{booking.paymentReference}</span>.
               </p>
             </div>
 
             <div className="space-y-1.5">
-              <Label>Paid to account</Label>
-              <Select value={currency} onValueChange={onCurrencyChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select account" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USD">USD receiving account</SelectItem>
-                  <SelectItem value="RWF">Rwf receiving account</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="booking-amount">
-                Amount paid ({currency === 'RWF' ? 'Rwf' : 'USD'})
-              </Label>
+              <Label htmlFor="booking-amount">Amount paid (Rwf)</Label>
               <NumberInput
                 id="booking-amount"
-                min={0.01}
-                step="0.01"
+                min={1}
+                step="1"
                 value={amountPaid}
                 onChange={(event) => setAmountPaid(event.target.value)}
                 disabled={submit.isPending}

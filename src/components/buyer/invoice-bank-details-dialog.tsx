@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { formatDate, formatUsd } from '@/lib/format';
+import { formatDate, formatInvoiceTotal } from '@/lib/format';
 import { downloadInvoiceDocument } from '@/lib/api/buyer';
 import { invoiceStatusHint } from '@/lib/buyer/invoice-flow';
 import { Button } from '@/components/ui/button';
@@ -47,7 +47,7 @@ export function InvoiceBankDetailsDialog({
           </div>
           <div>
             <dt className="text-muted-foreground">Amount due</dt>
-            <dd className="font-medium">{formatUsd(invoice.totalAmountUsd)}</dd>
+            <dd className="font-medium">{formatInvoiceTotal(invoice)}</dd>
           </div>
           <div>
             <dt className="text-muted-foreground">Payment reference</dt>
@@ -59,7 +59,8 @@ export function InvoiceBankDetailsDialog({
               <dd>{invoice.beneficiaryName}</dd>
             </div>
           ) : null}
-          {invoice.bankName || invoice.accountNumber ? (
+          {invoice.currency === 'USD' &&
+          (invoice.bankName || invoice.accountNumber) ? (
             <div>
               <dt className="text-muted-foreground">USD receiving account</dt>
               <dd>
@@ -93,8 +94,9 @@ export function InvoiceBankDetailsDialog({
           ) : null}
         </dl>
         <p className="text-xs text-muted-foreground">
-          Pay to either the USD or Rwf account and include the payment reference
-          on your transfer.
+          {invoice.currency === 'USD'
+            ? 'Pay to either the USD or Rwf account and include the payment reference on your transfer.'
+            : 'Pay to the Rwf account and include the payment reference on your transfer.'}
         </p>
         {hint ? (
           <p className="rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">

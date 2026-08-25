@@ -6,7 +6,6 @@ import { ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { HomePerfectFitSkeleton } from '@/components/marketing/home-perfect-fit-skeleton';
 import { ListingCard } from '@/components/marketing/listing-card';
 import { ListingGridSkeleton } from '@/components/marketing/listing-grid-skeleton';
-import { PriceCurrencyToggle } from '@/components/marketing/price-currency-provider';
 import {
   useMarketingCatalogLoading,
   useMarketingCategories,
@@ -93,7 +92,6 @@ export function HomePerfectFit() {
               Find Your Perfect Fit
             </h2>
             <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-              <PriceCurrencyToggle />
               {activeTab ? (
                 <Link
                   href={vehiclesHref({ category: activeTab.categorySlug })}

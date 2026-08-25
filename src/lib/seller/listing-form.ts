@@ -5,6 +5,7 @@ import type {
 } from '@/schemas/seller';
 import type { SellerListing } from '@/types/seller/marketplace';
 import { listingConditions } from '@/schemas/marketplace';
+import { usdtToRwf } from '@/lib/format';
 
 export function sellerListingToFormValues(
   listing: SellerListing,
@@ -32,9 +33,14 @@ export function sellerListingToFormValues(
     mileageKm: listing.mileageKm ?? undefined,
     rangeKm: listing.evSpecs?.rangeKm ?? undefined,
     batteryHealthPercent: listing.evSpecs?.batteryHealthPercent ?? undefined,
-    fobPriceUsd: listing.listingPricing?.fobPriceUsd ?? undefined,
-    sellerDesiredPayoutUsd:
-      listing.listingPricing?.sellerDesiredPayoutUsd ?? undefined,
+    fobPriceRwf:
+      listing.listingPricing?.fobPriceRwf ??
+      usdtToRwf(listing.listingPricing?.fobPriceUsd) ??
+      undefined,
+    sellerDesiredPayoutRwf:
+      listing.listingPricing?.sellerDesiredPayoutRwf ??
+      usdtToRwf(listing.listingPricing?.sellerDesiredPayoutUsd) ??
+      undefined,
   };
 }
 
@@ -42,8 +48,8 @@ export function toSellerListingBody(
   input: CreateSellerListingInput | UpdateSellerListingInput,
 ) {
   const {
-    sellerDesiredPayoutUsd,
-    fobPriceUsd,
+    sellerDesiredPayoutRwf,
+    fobPriceRwf,
     description,
     trim,
     mileageKm,
@@ -62,12 +68,12 @@ export function toSellerListingBody(
         input.condition === 'NEW' ? undefined : input.batteryHealthPercent,
     },
     pricing: {
-      sellerDesiredPayoutUsd:
+      sellerDesiredPayoutRwf:
         input.sellerType === 'LOCAL_SELLER'
-          ? sellerDesiredPayoutUsd
+          ? sellerDesiredPayoutRwf
           : undefined,
-      fobPriceUsd:
-        input.sellerType === 'INTERNATIONAL_SELLER' ? fobPriceUsd : undefined,
+      fobPriceRwf:
+        input.sellerType === 'INTERNATIONAL_SELLER' ? fobPriceRwf : undefined,
     },
   };
 }

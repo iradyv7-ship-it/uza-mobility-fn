@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { workspaceRoutes } from '@/config/routes';
-import { formatUsd } from '@/lib/format';
+import { formatListingPrice } from '@/lib/format';
 import { useSessionUser } from '@/hooks/session-user';
 import { useBuyerProfile, useRequestInvoice } from '@/queries/buyer';
 import {
@@ -124,7 +124,7 @@ export function RequestInvoiceDialog({
                 {selectedListing.listingPricing?.finalPriceUsd != null ? (
                   <p className="text-muted-foreground">
                     From{' '}
-                    {formatUsd(selectedListing.listingPricing.finalPriceUsd)}
+                    {formatListingPrice(selectedListing.listingPricing)}
                   </p>
                 ) : null}
               </div>

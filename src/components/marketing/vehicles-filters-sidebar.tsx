@@ -145,7 +145,7 @@ export function VehiclesFiltersSidebar({
 
       <div className="space-y-2">
         <Label className="text-sm font-medium text-[#151515]">
-          Price (USD)
+          Price (Rwf)
         </Label>
         <div className="grid grid-cols-2 gap-2">
           <Input
