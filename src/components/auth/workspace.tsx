@@ -1,3 +1,4 @@
+import type { ElementType } from 'react';
 'use client';
 
 import Link from 'next/link';
@@ -56,7 +57,7 @@ export function Workspace({ title, navItems, children }: WorkspaceProps) {
               {item.icon ? (
                 <span className="mr-2 flex items-center text-primary/80">
                   {(() => {
-                    const Icon = item.icon as any;
+                    const Icon: ElementType = item.icon;
                     return <Icon className="size-4" />;
                   })()}
                 </span>

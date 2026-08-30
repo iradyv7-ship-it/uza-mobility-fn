@@ -1,3 +1,4 @@
+import type { ElementType } from 'react';
 'use client';
 
 import Image from 'next/image';
@@ -91,7 +92,7 @@ export function WorkspaceShell({
                                 )}
                               >
                                 {(() => {
-                                  const Icon = item.icon as any;
+                                  const Icon: ElementType = item.icon;
                                   return <Icon className="size-4" />;
                                 })()}
                               </span>

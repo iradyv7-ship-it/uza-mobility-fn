@@ -1,0 +1,53 @@
+# Every push and pull request runs exactly what a developer runs locally.
+#
+# `npm run verify` is the same command here and on a laptop, so a red tick is
+# reproducible in one step rather than by guessing which flags CI used.
+name: verify
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # Next inlines public env at build time. These are placeholders so the build
+      # is reproducible in CI; nothing here reaches a real environment.
+      NEXT_PUBLIC_API_URL: http://localhost:7000
+      NEXTAUTH_SECRET: ci-only-not-a-real-secret
+      NEXTAUTH_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run verify
+
+      # A Next application that typechecks can still fail to build — a server
+      # component reaching for a browser API, a bad dynamic import. The build is
+      # the only check that catches it, so it runs on every push.
+      - run: npm run build
+
+  audit:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high

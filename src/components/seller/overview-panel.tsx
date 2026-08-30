@@ -1,3 +1,4 @@
+import type { ElementType } from 'react';
 'use client';
 
 import Link from 'next/link';
@@ -123,7 +124,7 @@ function StatCard({
         {icon ? (
           <span className="text-muted-foreground">
             {(() => {
-              const Icon = icon as any;
+              const Icon: ElementType = icon;
               return <Icon className="size-5" />;
             })()}
           </span>
