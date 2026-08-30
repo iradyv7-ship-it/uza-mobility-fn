@@ -6,7 +6,26 @@ import {
   workspaceRoutes,
 } from '@/config/routes';
 import { isMeUser } from '@/types/auth/me-user';
+import { findLender } from '@/config/lenders';
 import { NextResponse } from 'next/server';
+
+/**
+ * The cash-collateral facility, refused before anything renders.
+ *
+ * A signed-in bank that is not entitled must get the same answer as anyone typing a URL
+ * that does not exist: a 404, with a 404 status. Not a redirect, which says "you are
+ * somewhere real but not allowed", and not `notFound()` inside the page, which serves
+ * the 404 body with a 200 status once streaming has begun — that status difference alone
+ * told Equity that `collateral` is a real route on a real lender.
+ *
+ * Entitlement is read from `config/lenders.ts`, so this stays one rule for every bank
+ * rather than a list of names in the routing layer.
+ */
+function isUnentitledCollateralPath(pathname: string): boolean {
+  const [, root, key, leaf] = pathname.split('/');
+  if (root !== 'lender' || leaf !== 'collateral') return false;
+  return findLender(key ?? '')?.seesCollateral !== true;
+}
 
 const legacyRedirects: Record<string, string> = {
   '/dashboard': workspaceRoutes.account,
@@ -30,6 +49,11 @@ export default auth((req) => {
   const isProtected = protectedWorkspacePrefixes.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
+
+  // Before authentication is even consulted: the answer must not depend on who asks.
+  if (isUnentitledCollateralPath(pathname)) {
+    return NextResponse.rewrite(new URL('/not-found', req.nextUrl.origin), { status: 404 });
+  }
 
   const user = req.auth?.user;
 
@@ -63,6 +87,8 @@ export const config = {
     '/my/:path*',
     '/seller/:path*',
     '/operator/:path*',
+    '/lender/:path*',
+    '/workshop/:path*',
     '/login',
     '/register',
     '/forgot-password',

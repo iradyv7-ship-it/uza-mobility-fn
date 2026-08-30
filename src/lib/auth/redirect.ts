@@ -4,13 +4,41 @@ import {
   hasBuyerWorkspace,
   hasMarketplaceWorkspace,
   hasOperatorWorkspace,
+  hasLenderWorkspace,
   hasSellerWorkspace,
+  hasWorkshopWorkspace,
   isStaffOnlyAccount,
 } from '@/lib/permissions';
+import { findLender } from '@/config/lenders';
 import type { MeUser } from '@/types/auth/me-user';
 
 function pathStartsWith(path: string, prefix: string) {
   return path === prefix || path.startsWith(`${prefix}/`);
+}
+
+/**
+ * Whether this user may open a path under `/lender`.
+ *
+ * Two separate questions, and the order matters:
+ *
+ *  1. Does the URL name a lender at all? An unknown key is refused before anything
+ *     about this user is consulted, so the answer cannot vary by who is asking.
+ *  2. Does this user hold that lender's role, and — for the collateral page — is that
+ *     lender entitled to the facility?
+ *
+ * The collateral check lives here rather than in the page because a page cannot reliably
+ * change the response status once React has begun streaming: `notFound()` inside it
+ * served the 404 body with a 200 status, and that status difference alone told Equity
+ * that `collateral` is a real route on a real lender. Deciding it before rendering is
+ * the only place the status is still ours to set.
+ */
+function canAccessLenderPath(me: MeUser, path: string): boolean {
+  const [, , key, ...rest] = path.split('/');
+  const lender = key ? findLender(key) : undefined;
+  if (!lender) return false;
+  if (!hasLenderWorkspace(lender.key, me.roles)) return false;
+  if (rest[0] === 'collateral') return lender.seesCollateral === true;
+  return true;
 }
 
 /** Whether this signed-in user may open a protected workspace path. */
@@ -26,6 +54,12 @@ export function canAccessWorkspacePath(me: MeUser, path: string): boolean {
   }
   if (pathStartsWith(path, workspaceRoutes.operator)) {
     return canAccessOperatorPath(me, path);
+  }
+  if (pathStartsWith(path, workspaceRoutes.lender)) {
+    return canAccessLenderPath(me, path);
+  }
+  if (pathStartsWith(path, workspaceRoutes.workshop)) {
+    return hasWorkshopWorkspace(me.roles);
   }
   return true;
 }

@@ -31,6 +31,13 @@ export const workspaceRoutes = {
   operatorStations: '/operator/stations',
   operatorProfile: '/operator/profile',
   operatorNotifications: '/operator/notifications',
+  /**
+   * The institution portals. One path prefix, not one per bank — a bank is a row in
+   * `config/lenders.ts`, so listing them here would be the code change that file exists
+   * to avoid.
+   */
+  lender: '/lender',
+  workshop: '/workshop',
 } as const;
 
 export const publicOnlyAuthPaths = [
@@ -45,4 +52,6 @@ export const protectedWorkspacePrefixes = [
   workspaceRoutes.account,
   workspaceRoutes.seller,
   workspaceRoutes.operator,
+  workspaceRoutes.lender,
+  workspaceRoutes.workshop,
 ] as const;

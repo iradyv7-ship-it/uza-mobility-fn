@@ -1,6 +1,7 @@
 import { workspaceRoutes } from '@/config/routes';
 import type { MeUser } from '@/types/auth/me-user';
 import type { PlatformRole } from '@/types/auth/role';
+import { lenderRole } from '@/config/lenders';
 
 /** Staff roles that use uza-mobility-admin (not this marketplace app). */
 export const PLATFORM_STAFF_ROLES: PlatformRole[] = [
@@ -171,4 +172,40 @@ export function hasBuyerWorkspace(
     return true;
   }
   return canAny(permissions, [...BUYER_WORKSPACE_PERMISSIONS]);
+}
+
+
+/**
+ * Whether these roles open a given lender's portal.
+ *
+ * Convention, not configuration: the role name follows from the lender key, so
+ * onboarding a bank is one row in `lenders.ts` plus one role row in the database.
+ *
+ * SUPER_ADMIN is included because somebody has to be able to see a portal is broken.
+ * No other staff role is: a marketplace administrator has no business inside a bank's
+ * borrower files, and "they are staff" is not consent under 058/2021.
+ */
+export function hasLenderWorkspace(
+  lenderKey: string,
+  roles?: readonly string[] | null,
+): boolean {
+  if (!roles?.length) return false;
+  return roles.includes(lenderRole(lenderKey)) || roles.includes('SUPER_ADMIN');
+}
+
+/** Every lender key these roles open. Used to route somebody to their own bank. */
+export function lenderKeysFor(
+  lenderKeys: readonly string[],
+  roles?: readonly string[] | null,
+): string[] {
+  return lenderKeys.filter((key) => hasLenderWorkspace(key, roles));
+}
+
+export function hasWorkshopWorkspace(roles?: readonly string[] | null): boolean {
+  if (!roles?.length) return false;
+  return (
+    roles.includes('MECHANIC') ||
+    roles.includes('WORKSHOP_ADMIN') ||
+    roles.includes('SUPER_ADMIN')
+  );
 }

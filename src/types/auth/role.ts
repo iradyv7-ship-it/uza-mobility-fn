@@ -10,6 +10,17 @@ export const PLATFORM_ROLES = [
   'SELLER',
   'BUYER',
   'CHARGING_OPERATOR',
+  'MECHANIC',
+  'WORKSHOP_ADMIN',
 ] as const;
 
-export type PlatformRole = (typeof PLATFORM_ROLES)[number];
+/**
+ * A financial institution's role.
+ *
+ * Not a member of PLATFORM_ROLES, deliberately. Lenders are onboarded as data — see
+ * `src/config/lenders.ts` — so the set is open, and closing it here would turn signing
+ * a new bank into a type change, a pull request and a deploy.
+ */
+export type LenderRole = `LENDER_${string}`;
+
+export type PlatformRole = (typeof PLATFORM_ROLES)[number] | LenderRole;
