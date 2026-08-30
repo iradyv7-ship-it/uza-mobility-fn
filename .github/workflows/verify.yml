@@ -22,8 +22,10 @@ jobs:
       # Next inlines public env at build time. These are placeholders so the build
       # is reproducible in CI; nothing here reaches a real environment.
       NEXT_PUBLIC_API_URL: http://localhost:7000
-      NEXTAUTH_SECRET: ci-only-not-a-real-secret
-      NEXTAUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      # AUTH_SECRET, not NEXTAUTH_SECRET — this app is on Auth.js v5, which renamed it.
+      # Getting it wrong builds green and fails at runtime with an opaque session error.
+      AUTH_SECRET: ci-only-not-a-real-secret
 
     steps:
       - uses: actions/checkout@v4
