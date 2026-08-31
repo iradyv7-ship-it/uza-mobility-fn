@@ -46,6 +46,17 @@ const apiUrl = (
 ).replace(/\/$/, '');
 
 const config: NextConfig = {
+  /*
+   * Standalone output: the build emits a server plus only the node_modules it actually
+   * traced, so it runs in any Node container.
+   *
+   * Vercel does not need this — it is added so the application is not *only* deployable
+   * to Vercel. UZA's sovereign-cloud path (Alibaba Apsara Stack) needs an image, and a
+   * customer-facing application that can be hosted in exactly one place is a commercial
+   * dependency, not a technical convenience.
+   */
+  output: 'standalone',
+
   // React Compiler (already enabled in this project)
   reactCompiler: true,
 

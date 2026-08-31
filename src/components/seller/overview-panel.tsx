@@ -1,5 +1,6 @@
-import type { ElementType } from 'react';
 'use client';
+
+import type { ElementType } from 'react';
 
 import Link from 'next/link';
 import { PageHeader } from '@/components/shared/page-header';

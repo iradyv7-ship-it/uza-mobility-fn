@@ -1,5 +1,6 @@
-import type { ElementType } from 'react';
 'use client';
+
+import type { ElementType } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
