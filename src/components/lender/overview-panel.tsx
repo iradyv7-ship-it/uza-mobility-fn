@@ -56,6 +56,35 @@ export function LenderOverviewPanel({ lender }: { lender: LenderConfig }) {
           reference that is not yours returns the same answer as one that does not exist.
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Who UZA is in this relationship</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm text-muted-foreground">
+          {/*
+            The data model is unambiguous on this — Loan.borrower is a person, UZA appears
+            only as originator, data provider and (for one lender) collateral depositor —
+            but until 12 September 2026 nothing on this screen said so, and a bank officer
+            opening the portal for the first time had to infer it. Stating it matters
+            beyond courtesy: UZA borrowing and on-lending would make UZA a credit provider,
+            which it is not and must not appear to be.
+          */}
+          <p>
+            <strong className="text-foreground">The borrower on every loan is the driver named.</strong>{' '}
+            UZA Solutions originates these applications, trains and places the drivers, and
+            provides the data you see here. UZA is not a party to the loan and does not hold
+            client money.
+          </p>
+          {lender.seesCollateral ? (
+            <p>
+              For {lender.name}, UZA Empower additionally holds the cash-collateral facility
+              shown under <em>Credit enhancement</em>. It is a pledge in support of these
+              loans, not a guarantee of repayment.
+            </p>
+          ) : null}
+        </CardContent>
+      </Card>
     </div>
   );
 }
