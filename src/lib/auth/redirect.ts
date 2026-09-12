@@ -1,6 +1,7 @@
 import { workspaceRoutes } from '@/config/routes';
 import {
   canAccessOperatorPath,
+  lenderKeysFor,
   hasBuyerWorkspace,
   hasMarketplaceWorkspace,
   hasOperatorWorkspace,
@@ -9,7 +10,7 @@ import {
   hasWorkshopWorkspace,
   isStaffOnlyAccount,
 } from '@/lib/permissions';
-import { findLender } from '@/config/lenders';
+import { findLender, LENDERS } from '@/config/lenders';
 import type { MeUser } from '@/types/auth/me-user';
 
 function pathStartsWith(path: string, prefix: string) {
@@ -83,6 +84,28 @@ export function resolvePostLoginRedirect(
 
 /** Default destination for a signed-in marketplace user (buyer / seller / operator). */
 export function authRedirect(me: MeUser): string {
+  // A bank officer or a mechanic has no marketplace workspace, and until 12 September 2026
+  // this function sent them to the homepage — vehicles, accessories, "customize your dream
+  // vehicle" — with their portal one URL away. The first thing a lender sees after signing
+  // in should be their own book. Checked before the staff-only rule because these roles
+  // are not platform staff and must not be bounced to the admin app either.
+  if (!isStaffOnlyAccount(me)) {
+    const lenderKeys = lenderKeysFor(
+      LENDERS.map((l) => l.key),
+      me.roles,
+    );
+    if (lenderKeys.length === 1 && !hasMarketplaceWorkspace(me)) {
+      return `${workspaceRoutes.lender}/${lenderKeys[0]}`;
+    }
+    if (
+      hasWorkshopWorkspace(me.roles) &&
+      !hasMarketplaceWorkspace(me) &&
+      lenderKeys.length === 0
+    ) {
+      return workspaceRoutes.workshop;
+    }
+  }
+
   if (isStaffOnlyAccount(me) || !hasMarketplaceWorkspace(me)) {
     return '/';
   }
