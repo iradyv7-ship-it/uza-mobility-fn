@@ -20,6 +20,7 @@ import {
   Settings,
   FileText,
   CreditCard,
+  PiggyBank,
 } from 'lucide-react';
 
 export type NavItem = {
@@ -83,6 +84,11 @@ export const accountNav: NavItem[] = [
     href: workspaceRoutes.accountFinancing,
     icon: Percent,
   },
+  {
+    label: 'My wallet',
+    href: workspaceRoutes.accountWallet,
+    icon: PiggyBank,
+  },
   { label: 'Profile', href: workspaceRoutes.accountProfile, icon: User },
   {
     label: 'Notifications',
@@ -122,6 +128,11 @@ export const buyerNavGroups: NavGroup[] = [
         label: 'Financing',
         href: workspaceRoutes.accountFinancing,
         icon: Percent,
+      },
+      {
+        label: 'My wallet',
+        href: workspaceRoutes.accountWallet,
+        icon: PiggyBank,
       },
       {
         label: 'Wishlist',

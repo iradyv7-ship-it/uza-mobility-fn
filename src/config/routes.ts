@@ -15,6 +15,7 @@ export const workspaceRoutes = {
   accountBookings: '/my/bookings',
   accountPayments: '/my/payments',
   accountFinancing: '/my/financing',
+  accountWallet: '/my/wallet',
   accountProfile: '/my/profile',
   accountNotifications: '/my/notifications',
   accountWishlist: '/my/wishlist',
