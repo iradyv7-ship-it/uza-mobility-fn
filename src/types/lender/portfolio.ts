@@ -70,3 +70,56 @@ export interface CreditEnhancement {
   released: number;
   calledBack: number;
 }
+
+/**
+ * The loan-detail view — one file, everything a bank officer needs to act on it. Every
+ * type here mirrors `LenderService`'s own return shapes in uza-mobility-bn exactly (see
+ * that file's doc comments for what each data product means and why it exists).
+ */
+
+export type LenderDecisionOutcome = 'APPROVED' | 'REJECTED' | 'CONDITIONAL';
+
+export interface LenderDecisionRecord {
+  id: string;
+  loanId: string;
+  outcome: LenderDecisionOutcome;
+  reasons: string;
+  conditions: string | null;
+  decidedAt: string;
+}
+
+export interface LenderInfoRequestRecord {
+  id: string;
+  loanId: string;
+  question: string;
+  answer: string | null;
+  askedAt: string;
+  answeredAt: string | null;
+}
+
+export type InspectionFindingSeverity = 'MINOR' | 'MAJOR' | 'SAFETY';
+
+export interface LenderInspectionFinding {
+  item: string;
+  severity: InspectionFindingSeverity;
+  correctiveAction: string;
+  resolvedAt?: string;
+}
+
+export type VehicleCondition = 'GOOD' | 'FAIR' | 'POOR' | 'URGENT_ATTENTION';
+
+export interface LenderInspectionRecord {
+  id: string;
+  inspectedAt: string;
+  mileageKm: number | null;
+  batteryHealthPct: number | null;
+  condition: VehicleCondition;
+  notes: string | null;
+  findings: LenderInspectionFinding[] | null;
+  passed: boolean | null;
+  certificateRef: string | null;
+}
+
+/** A lender proposing a change to a loan they cannot edit directly — requires UZA review. */
+export const loanChangeTypes = ['TENOR', 'CONTRIBUTION', 'VEHICLE_PRICE'] as const;
+export type LoanChangeType = (typeof loanChangeTypes)[number];

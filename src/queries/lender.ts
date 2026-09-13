@@ -1,15 +1,26 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
+import { ApiClientError } from '@/lib/api';
 import {
+  askLenderInfoRequest,
   getCreditEnhancement,
   getLenderApplications,
   getLenderBorrowers,
   getLenderDisbursements,
+  getLenderLoanDecisions,
+  getLenderLoanInfoRequests,
+  getLenderLoanInspections,
+  getLenderLoanSavings,
+  getLenderLoanTraining,
   getLenderPortfolio,
   getLenderSummary,
+  recordLenderDecision,
+  submitLoanChangeRequest,
 } from '@/lib/api/lender';
+import type { LenderDecisionOutcome, LoanChangeType } from '@/types/lender/portfolio';
 
 /**
  * Every query is keyed by the lender.
@@ -27,7 +38,23 @@ export const lenderKeys = {
   disbursements: (lender: string) => [...lenderKeys.all(lender), 'disbursements'] as const,
   portfolio: (lender: string) => [...lenderKeys.all(lender), 'portfolio'] as const,
   collateral: (lender: string) => [...lenderKeys.all(lender), 'collateral'] as const,
+  loanInspections: (lender: string, loanId: string) =>
+    [...lenderKeys.all(lender), 'loan', loanId, 'inspections'] as const,
+  loanSavings: (lender: string, loanId: string) =>
+    [...lenderKeys.all(lender), 'loan', loanId, 'savings'] as const,
+  loanTraining: (lender: string, loanId: string) =>
+    [...lenderKeys.all(lender), 'loan', loanId, 'training'] as const,
+  loanDecisions: (lender: string, loanId: string) =>
+    [...lenderKeys.all(lender), 'loan', loanId, 'decisions'] as const,
+  loanInfoRequests: (lender: string, loanId: string) =>
+    [...lenderKeys.all(lender), 'loan', loanId, 'info-requests'] as const,
 };
+
+function mutationError(error: unknown) {
+  return error instanceof ApiClientError
+    ? error.message
+    : 'Something went wrong. Please try again.';
+}
 
 function useLenderAuth() {
   const { data, status } = useSession();
@@ -94,5 +121,108 @@ export function useCreditEnhancement(lender: string) {
     queryKey: lenderKeys.collateral(lender),
     queryFn: () => getCreditEnhancement(lender, token),
     enabled: ready,
+  });
+}
+
+// ── One loan's file ─────────────────────────────────────────────────────────────────────
+
+export function useLenderLoanInspections(lender: string, loanId: string) {
+  const { token, ready } = useLenderAuth();
+  return useQuery({
+    queryKey: lenderKeys.loanInspections(lender, loanId),
+    queryFn: () => getLenderLoanInspections(lender, loanId, token),
+    enabled: ready && !!loanId,
+  });
+}
+
+export function useLenderLoanSavings(lender: string, loanId: string) {
+  const { token, ready } = useLenderAuth();
+  return useQuery({
+    queryKey: lenderKeys.loanSavings(lender, loanId),
+    queryFn: () => getLenderLoanSavings(lender, loanId, token),
+    enabled: ready && !!loanId,
+  });
+}
+
+export function useLenderLoanTraining(lender: string, loanId: string) {
+  const { token, ready } = useLenderAuth();
+  return useQuery({
+    queryKey: lenderKeys.loanTraining(lender, loanId),
+    queryFn: () => getLenderLoanTraining(lender, loanId, token),
+    enabled: ready && !!loanId,
+  });
+}
+
+export function useLenderLoanDecisions(lender: string, loanId: string) {
+  const { token, ready } = useLenderAuth();
+  return useQuery({
+    queryKey: lenderKeys.loanDecisions(lender, loanId),
+    queryFn: () => getLenderLoanDecisions(lender, loanId, token),
+    enabled: ready && !!loanId,
+  });
+}
+
+export function useLenderLoanInfoRequests(lender: string, loanId: string) {
+  const { token, ready } = useLenderAuth();
+  return useQuery({
+    queryKey: lenderKeys.loanInfoRequests(lender, loanId),
+    queryFn: () => getLenderLoanInfoRequests(lender, loanId, token),
+    enabled: ready && !!loanId,
+  });
+}
+
+export function useRecordLenderDecision(lender: string, loanId: string) {
+  const { token } = useLenderAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      outcome: LenderDecisionOutcome;
+      reasons: string;
+      conditions?: string;
+    }) => recordLenderDecision(lender, loanId, body, token),
+    onSuccess: () => {
+      toast.success('Decision recorded');
+      void queryClient.invalidateQueries({
+        queryKey: lenderKeys.loanDecisions(lender, loanId),
+      });
+      void queryClient.invalidateQueries({ queryKey: lenderKeys.applications(lender) });
+      void queryClient.invalidateQueries({ queryKey: lenderKeys.borrowers(lender) });
+    },
+    onError: (error) => toast.error(mutationError(error)),
+  });
+}
+
+export function useAskLenderInfoRequest(lender: string, loanId: string) {
+  const { token } = useLenderAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { question: string }) =>
+      askLenderInfoRequest(lender, loanId, body, token),
+    onSuccess: () => {
+      toast.success('Question sent to UZA');
+      void queryClient.invalidateQueries({
+        queryKey: lenderKeys.loanInfoRequests(lender, loanId),
+      });
+    },
+    onError: (error) => toast.error(mutationError(error)),
+  });
+}
+
+/**
+ * The "requires permission, but should be possible" gate: propose a change UZA must
+ * review before it takes effect. There is no list-my-own-requests endpoint on the lender
+ * side (only UZA's review queue has one) — this mutation is intentionally fire-and-forget
+ * from this portal's point of view; the lender is notified of the outcome separately.
+ */
+export function useSubmitLoanChangeRequest(lender: string, loanId: string) {
+  const { token } = useLenderAuth();
+  return useMutation({
+    mutationFn: (body: {
+      changeType: LoanChangeType;
+      payload: Record<string, unknown>;
+      note?: string;
+    }) => submitLoanChangeRequest(lender, loanId, body, token),
+    onSuccess: () => toast.success('Change proposed — UZA will review it'),
+    onError: (error) => toast.error(mutationError(error)),
   });
 }
