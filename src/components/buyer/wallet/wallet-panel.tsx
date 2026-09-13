@@ -57,7 +57,7 @@ export function WalletPanel() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Igikapu cyanjye · My wallet"
+        title="Ikigega cyanjye · My wallet"
         description="Twara EV — Twara. Tunga. Your savings, in your own account, labelled by what each part is for."
       />
 

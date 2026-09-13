@@ -85,7 +85,7 @@ export const accountNav: NavItem[] = [
     icon: Percent,
   },
   {
-    label: 'Igikapu · Wallet',
+    label: 'Ikigega · Wallet',
     href: workspaceRoutes.accountWallet,
     icon: PiggyBank,
   },
@@ -130,7 +130,7 @@ export const buyerNavGroups: NavGroup[] = [
         icon: Percent,
       },
       {
-        label: 'Igikapu · Wallet',
+        label: 'Ikigega · Wallet',
         href: workspaceRoutes.accountWallet,
         icon: PiggyBank,
       },
