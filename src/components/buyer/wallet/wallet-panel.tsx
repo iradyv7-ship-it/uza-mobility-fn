@@ -57,8 +57,8 @@ export function WalletPanel() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="My wallet"
-        description="Your savings, in your own account, labelled by what each part is for."
+        title="Igikapu cyanjye · My wallet"
+        description="Twara EV — Twara. Tunga. Your savings, in your own account, labelled by what each part is for."
       />
 
       <WhoseMoney whoseMoney={w.whoseMoney} />

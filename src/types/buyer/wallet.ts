@@ -14,7 +14,7 @@ export type BucketBalance = {
   confirmedRwf: number;
   pendingRwf: number;
   totalRwf: number;
-  label: { en: string; rw: string; purpose: string };
+  label: { en: string; rw: string; purpose: string; purposeRw: string };
 };
 
 export type DailyRecord = {

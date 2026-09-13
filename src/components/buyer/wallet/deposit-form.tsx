@@ -33,7 +33,7 @@ export function DepositForm({ split }: { split: Record<Bucket, number> }) {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">I made a deposit</CardTitle>
+        <CardTitle className="text-base">Nabitse · I made a deposit</CardTitle>
       </CardHeader>
       <CardContent>
         <form
@@ -71,7 +71,7 @@ export function DepositForm({ split }: { split: Record<Bucket, number> }) {
             </div>
           </fieldset>
           <Button type="submit" disabled={!valid || record.isPending} className="w-full sm:w-auto">
-            {record.isPending ? 'Recording…' : 'Record deposit'}
+            {record.isPending ? 'Birandikwa…' : 'Andika · Record'}
           </Button>
           <p className="text-xs text-muted-foreground">
             It shows as &ldquo;waiting for the bank&rdquo; until it appears on your statement. Your money is already in your account either way.

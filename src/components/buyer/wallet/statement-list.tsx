@@ -16,7 +16,7 @@ export function StatementList({ lines, loading }: { lines: LedgerLine[]; loading
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Statement</CardTitle>
+        <CardTitle className="text-base">Urutonde · Statement</CardTitle>
       </CardHeader>
       <CardContent>
         {loading ? (
@@ -37,7 +37,7 @@ export function StatementList({ lines, loading }: { lines: LedgerLine[]; loading
                     <span className="text-muted-foreground"> · {formatDate(l.occurredAt)}</span>
                   </div>
                   <div className="truncate text-xs text-muted-foreground">
-                    {l.confirmedAt ? 'Confirmed by the bank' : 'Waiting for the bank'}
+                    {l.confirmedAt ? 'Byemejwe na banki · confirmed' : 'Bitegereje banki · waiting for the bank'}
                     {l.externalRef ? ` · ${l.externalRef}` : ''}
                     {l.note ? ` · ${l.note}` : ''}
                   </div>

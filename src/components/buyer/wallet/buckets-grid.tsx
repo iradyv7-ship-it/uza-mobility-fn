@@ -20,7 +20,7 @@ export function BucketsGrid({ buckets }: { buckets: BucketBalance[] }) {
   return (
     <section aria-labelledby="buckets-h">
       <h2 id="buckets-h" className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-        What each part is for
+        Buri gice ni icy’iki · What each part is for
       </h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {buckets.map((b) => {
@@ -29,18 +29,21 @@ export function BucketsGrid({ buckets }: { buckets: BucketBalance[] }) {
             <Card key={b.bucket} className={b.bucket === 'LOAN' ? 'border-primary/40' : undefined}>
               <CardContent className="space-y-2 p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{b.label.en}</span>
+                  <span className="text-sm font-medium">
+                    {b.label.rw}
+                    <span className="ml-1 font-normal text-muted-foreground">· {b.label.en}</span>
+                  </span>
                   <Icon className="size-4 text-muted-foreground" aria-hidden />
                 </div>
                 <div className="text-2xl font-semibold tabular-nums">{formatRwf(b.confirmedRwf)}</div>
                 {b.pendingRwf > 0 ? (
                   <p className="text-xs text-amber-700 dark:text-amber-400">
-                    + {formatRwf(b.pendingRwf)} waiting for the bank
+                    + {formatRwf(b.pendingRwf)} bitegereje banki · waiting for the bank
                   </p>
                 ) : (
-                  <p className="text-xs text-muted-foreground">{b.label.purpose}</p>
+                  <p className="text-xs text-muted-foreground">{b.label.purposeRw}</p>
                 )}
-                <p className="text-xs text-muted-foreground">{b.label.rw}</p>
+                <p className="text-xs text-muted-foreground">{b.label.purpose}</p>
               </CardContent>
             </Card>
           );

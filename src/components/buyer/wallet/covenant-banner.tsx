@@ -26,11 +26,11 @@ export function CovenantBanner({ warnings }: { warnings: WalletWarnings }) {
             <Button asChild size="sm" variant={alert ? 'destructive' : 'default'}>
               <a href="tel:+250788371081">
                 <PhoneCall className="size-4" aria-hidden />
-                I need help before I miss a payment
+                Hamagara mbere yo gusiba · Call before you miss
               </a>
             </Button>
             <span className="text-xs text-muted-foreground">
-              Calling now keeps this a conversation. Nothing bad happens for calling.
+              Guhamagara nta kibazo. Calling now keeps this a conversation; nothing bad happens for calling.
             </span>
           </div>
         </div>

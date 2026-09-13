@@ -18,12 +18,12 @@ export function PerformanceCard({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Your record — last {p.windowDays} days</CardTitle>
+        <CardTitle className="text-base">Amateka yawe · Your record — last {p.windowDays} days</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <dl className="grid grid-cols-3 gap-3 text-center">
           <div>
-            <dt className="text-xs text-muted-foreground">Consistency</dt>
+            <dt className="text-xs text-muted-foreground">Ubudahemuka · Consistency</dt>
             <dd className="text-xl font-semibold tabular-nums">{Math.round(p.consistencyRatio * 100)}%</dd>
           </div>
           <div>
@@ -54,7 +54,7 @@ export function PerformanceCard({
         {targets.contributionTargetRwf ? (
           <div className="space-y-1">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Toward your contribution</span>
+              <span className="text-muted-foreground">Ku musanzu wawe · Toward your contribution</span>
               <span className="tabular-nums">{p.progressPct ?? 0}% of {formatRwf(targets.contributionTargetRwf)}</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-muted" role="progressbar" aria-valuenow={p.progressPct ?? 0} aria-valuemin={0} aria-valuemax={100}>

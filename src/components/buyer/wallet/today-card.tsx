@@ -11,10 +11,10 @@ export function TodayCard({ today, streak }: { today: WalletOverview['today']; s
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center justify-between text-base">
-          <span>Today</span>
+          <span>Uyu munsi · Today</span>
           <span className="flex items-center gap-1 text-sm font-normal text-muted-foreground">
             <Flame className="size-4" aria-hidden />
-            {streak} day{streak === 1 ? '' : 's'} in a row
+            iminsi {streak} ikurikiranye · {streak} in a row
           </span>
         </CardTitle>
       </CardHeader>
@@ -30,8 +30,8 @@ export function TodayCard({ today, streak }: { today: WalletOverview['today']; s
           {today.targetRwf === 0
             ? 'No daily target yet — it is set when your vehicle is chosen.'
             : done
-              ? 'Today is done. Anything more goes to your own savings or the buffer.'
-              : `${formatRwf(today.remainingRwf)} still to deposit today. Counted from confirmed deposits in the loan, maintenance, charging and insurance buckets.`}
+              ? 'Uyu munsi warangije. Today is done — anything more goes to your own savings or the buffer.'
+              : `${formatRwf(today.remainingRwf)} bisigaye uyu munsi · still to deposit today. Counted from confirmed deposits in the loan, maintenance, charging and insurance buckets.`}
         </p>
       </CardContent>
     </Card>

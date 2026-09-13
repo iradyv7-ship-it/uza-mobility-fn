@@ -29,7 +29,7 @@ export function MoveBetweenBuckets({ buckets: balances }: { buckets: BucketBalan
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Move between buckets</CardTitle>
+        <CardTitle className="text-base">Kwimura · Move between buckets</CardTitle>
       </CardHeader>
       <CardContent>
         <form
@@ -67,7 +67,7 @@ export function MoveBetweenBuckets({ buckets: balances }: { buckets: BucketBalan
             {allocate.isPending ? 'Moving…' : 'Move the label'}
           </Button>
           <p className="text-xs text-muted-foreground">
-            Only the label moves; your balance at the bank is the same. Money set aside for the loan stays there — if a week is short, use the help button above.
+            Hahinduka izina gusa; amafaranga aguma aho ari. Only the label moves; your balance at the bank is the same. Money set aside for the loan stays there — if a week is short, use the help button above.
           </p>
         </form>
       </CardContent>
