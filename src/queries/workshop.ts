@@ -2,13 +2,19 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
-import { getJobCards, getMechanics, getRescueCalls } from '@/lib/api/workshop';
+import {
+  getJobCards,
+  getMechanics,
+  getRescueCalls,
+  getTrainingCourses,
+} from '@/lib/api/workshop';
 
 export const workshopKeys = {
   all: ['workshop'] as const,
   jobCards: () => [...workshopKeys.all, 'job-cards'] as const,
   rescue: () => [...workshopKeys.all, 'rescue'] as const,
   mechanics: () => [...workshopKeys.all, 'mechanics'] as const,
+  trainingCourses: () => [...workshopKeys.all, 'training-courses'] as const,
 };
 
 function useWorkshopAuth() {
@@ -32,4 +38,13 @@ export function useRescueCalls() {
 export function useMechanics() {
   const { token, ready } = useWorkshopAuth();
   return useQuery({ queryKey: workshopKeys.mechanics(), queryFn: () => getMechanics(token), enabled: ready });
+}
+
+export function useTrainingCourses() {
+  const { token, ready } = useWorkshopAuth();
+  return useQuery({
+    queryKey: workshopKeys.trainingCourses(),
+    queryFn: () => getTrainingCourses(token),
+    enabled: ready,
+  });
 }

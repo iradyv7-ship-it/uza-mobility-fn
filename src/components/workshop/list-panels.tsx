@@ -2,8 +2,14 @@
 
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Column, DataTable } from '@/components/lender/data-table';
-import { useJobCards, useMechanics, useRescueCalls } from '@/queries/workshop';
+import {
+  useJobCards,
+  useMechanics,
+  useRescueCalls,
+  useTrainingCourses,
+} from '@/queries/workshop';
 import type { JobCard, Mechanic, RescueCall } from '@/types/workshop/job-card';
+import type { TrainingCourse } from '@/types/workshop/training-course';
 
 const text = (v: unknown) => (v == null || v === '' ? '—' : String(v));
 const when = (v: string | null) =>
@@ -65,6 +71,44 @@ export function MechanicsPanel() {
       columns={columns}
       query={useMechanics()}
       empty="No mechanics are registered."
+    />
+  );
+}
+
+/**
+ * The technician-training catalog — Mobility Ecosystem Blueprint, Section 05: "an agent
+ * continuously pulls available technician training... into a structured catalog each
+ * certified garage's portal surfaces to its own technicians." Read-only here; UZA staff
+ * curate it from the admin panel.
+ */
+export function TrainingCoursesPanel() {
+  const columns: Column<TrainingCourse>[] = [
+    {
+      header: 'Title',
+      cell: (r) =>
+        r.url ? (
+          <a href={r.url} target="_blank" rel="noreferrer" className="underline">
+            {r.title}
+          </a>
+        ) : (
+          r.title
+        ),
+    },
+    { header: 'Provider', cell: (r) => text(r.provider) },
+    {
+      header: 'Source',
+      cell: (r) => (r.source === 'CHINESE_OEM' ? 'Chinese OEM' : 'Local Rwandan'),
+    },
+    { header: 'Language', cell: (r) => text(r.language) },
+    { header: 'Category', cell: (r) => text(r.category.replaceAll('_', ' ')) },
+  ];
+  return (
+    <DataTable
+      title="Training courses"
+      description="Chinese OEM and locally-produced content, side by side."
+      columns={columns}
+      query={useTrainingCourses()}
+      empty="No courses yet."
     />
   );
 }

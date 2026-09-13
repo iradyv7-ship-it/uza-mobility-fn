@@ -1,6 +1,6 @@
 'use client';
 
-import { ClipboardList, LayoutGrid, LifeBuoy, Package, Users } from 'lucide-react';
+import { ClipboardList, GraduationCap, LayoutGrid, LifeBuoy, Package, Users } from 'lucide-react';
 import { WorkspaceShell } from '@/components/workspace/workspace-shell';
 import type { NavGroup } from '@/config/navigation';
 
@@ -16,7 +16,10 @@ const workshopNavGroups: NavGroup[] = [
   },
   {
     label: 'People',
-    items: [{ label: 'Mechanics', href: '/workshop/mechanics', icon: Users }],
+    items: [
+      { label: 'Mechanics', href: '/workshop/mechanics', icon: Users },
+      { label: 'Training courses', href: '/workshop/training-courses', icon: GraduationCap },
+    ],
   },
 ];
 
