@@ -19,7 +19,10 @@ export type BucketBalance = {
 
 export type DailyRecord = {
   date: string;
+  /** Confirmed by the institution. */
   depositedRwf: number;
+  /** Entered by the driver, still waiting for the bank. Not a miss while the hold lasts. */
+  pendingRwf: number;
   targetRwf: number;
   hit: boolean;
 };

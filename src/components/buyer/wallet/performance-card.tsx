@@ -36,15 +36,30 @@ export function PerformanceCard({
           </div>
         </dl>
 
-        {/* Thirty small bars: a full bar is a day on target, a short one a day with something, empty a miss. */}
+        {/* Thirty small bars: a full bar is a day on target, a short one a day with something,
+            a hatched one a day whose deposit is still waiting for the bank, empty a miss. */}
         <div className="flex h-10 items-end gap-0.5" aria-label="Last 30 days of deposits">
           {last30.map((d) => {
-            const h = d.targetRwf > 0 ? Math.min(100, Math.round((d.depositedRwf / d.targetRwf) * 100)) : d.depositedRwf > 0 ? 100 : 0;
+            const waiting = d.depositedRwf === 0 && d.pendingRwf > 0;
+            const shown = waiting ? d.pendingRwf : d.depositedRwf;
+            const h = d.targetRwf > 0 ? Math.min(100, Math.round((shown / d.targetRwf) * 100)) : shown > 0 ? 100 : 0;
             return (
               <div
                 key={d.date}
-                title={`${d.date}: ${formatRwf(d.depositedRwf)}`}
-                className={`flex-1 rounded-sm ${d.hit ? 'bg-emerald-600' : d.depositedRwf > 0 ? 'bg-amber-500' : 'bg-muted'}`}
+                title={
+                  waiting
+                    ? `${d.date}: ${formatRwf(d.pendingRwf)} bitegereje banki · waiting for the bank`
+                    : `${d.date}: ${formatRwf(d.depositedRwf)}`
+                }
+                className={`flex-1 rounded-sm ${
+                  d.hit
+                    ? 'bg-emerald-600'
+                    : waiting
+                      ? 'border border-dashed border-emerald-600/70 bg-emerald-600/15'
+                      : d.depositedRwf > 0
+                        ? 'bg-amber-500'
+                        : 'bg-muted'
+                }`}
                 style={{ height: `${Math.max(8, h)}%` }}
               />
             );
@@ -64,7 +79,7 @@ export function PerformanceCard({
         ) : null}
 
         <p className="text-xs text-muted-foreground">
-          Confirmed deposits only. This is the record your lender reads — with your consent — so it counts only what the bank has seen.
+          Confirmed deposits only. This is the record your lender reads — with your consent — so it counts only what the bank has seen. A dashed bar is a deposit you entered that the bank has not confirmed yet: it keeps your streak, and it is not a miss.
         </p>
       </CardContent>
     </Card>
