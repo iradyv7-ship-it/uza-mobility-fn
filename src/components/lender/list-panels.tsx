@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { StatusBadge } from '@/components/shared/status-badge';
+import { CovenantBadge } from '@/components/lender/covenant-badge';
 import { Column, DataTable } from '@/components/lender/data-table';
 import { LenderLoanDetailSheet, type LoanSummaryHeader } from '@/components/lender/loan-detail-sheet';
 import { Button } from '@/components/ui/button';
@@ -84,6 +85,9 @@ export function BorrowersPanel({ lender }: { lender: string }) {
     { header: 'Loan', cell: (r) => text(r.loanRef) },
     { header: 'Balance', numeric: true, cell: (r) => formatRwf(r.balance) },
     { header: 'Status', cell: (r) => <StatusBadge status={r.status} /> },
+    // What the covenant engine has open on this loan, right on the row. The officer should
+    // not need the warnings page to see who needs a call today; the sheet explains why.
+    { header: 'Warnings', cell: (r) => <CovenantBadge worst={r.worst} count={r.openWarnings} /> },
     {
       header: '',
       cell: (r) => (

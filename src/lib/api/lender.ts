@@ -10,6 +10,7 @@ import type {
   LenderDisbursement,
   LenderInfoRequestRecord,
   LenderInspectionRecord,
+  LenderLoanCovenants,
   LenderPortfolioRow,
   LenderSummary,
   LoanChangeType,
@@ -79,6 +80,14 @@ export function getLenderLoanSavings(lenderKey: string, loanId: string, token?: 
  * LenderService.trainingForLoan. */
 export function getLenderLoanTraining(lenderKey: string, loanId: string, token?: string) {
   return authenticatedFetch<Record<string, unknown>>(`${loanBase(lenderKey, loanId)}/training`, {
+    token,
+  });
+}
+
+/** Open covenant warnings on one loan, lender-facing ones only — see
+ * LenderService.covenantsForLoan. Explains the badge on the borrower row. */
+export function getLenderLoanCovenants(lenderKey: string, loanId: string, token?: string) {
+  return authenticatedFetch<LenderLoanCovenants>(`${loanBase(lenderKey, loanId)}/covenants`, {
     token,
   });
 }

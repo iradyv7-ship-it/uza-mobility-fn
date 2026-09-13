@@ -32,6 +32,26 @@ export interface LenderApplication {
   createdAt: string;
 }
 
+/**
+ * How loud the covenant engine is about a loan. NOTICE goes to the driver only; WARNING
+ * reaches UZA; ALERT is the point at which the lender is told. The lender therefore only
+ * ever sees WARNING and ALERT here — a NOTICE is the driver's business.
+ */
+export type CovenantSeverity = 'NOTICE' | 'WARNING' | 'ALERT';
+
+export interface LenderCovenant {
+  kind: string;
+  severity: CovenantSeverity;
+  message: string;
+  detail: Record<string, unknown>;
+}
+
+export interface LenderLoanCovenants {
+  loanRef: string | null;
+  worst: CovenantSeverity | null;
+  covenants: LenderCovenant[];
+}
+
 export interface LenderBorrower {
   id: string;
   /** The UZA ID. The same person in Nexus, Mobility and the workshop. */
@@ -40,6 +60,13 @@ export interface LenderBorrower {
   loanRef: string | null;
   balance: number | null;
   status: LoanStatus;
+  /**
+   * The worst open covenant the lender may see on this loan, or `null` when there is none
+   * — including when the loan is in a state the engine does not watch. `null` is "nothing
+   * to show", never "all clear".
+   */
+  worst: CovenantSeverity | null;
+  openWarnings: number;
 }
 
 export interface LenderDisbursement {

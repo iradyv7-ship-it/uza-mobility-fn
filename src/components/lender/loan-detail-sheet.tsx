@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { StatusBadge } from '@/components/shared/status-badge';
+import { CovenantBadge } from '@/components/lender/covenant-badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { NumberInput, numberRegisterOptions } from '@/components/ui/number-input';
@@ -29,6 +30,7 @@ import {
   useLenderLoanInfoRequests,
   useLenderLoanInspections,
   useLenderLoanSavings,
+  useLenderLoanCovenants,
   useLenderLoanTraining,
   useRecordLenderDecision,
   useSubmitLoanChangeRequest,
@@ -85,6 +87,7 @@ export function LenderLoanDetailSheet({ lender, loan, open, onOpenChange }: Prop
 
         {loan ? (
           <div className="space-y-8 py-6">
+            <Covenants lender={lender} loanId={loan.loanId} />
             <Decisions lender={lender} loanId={loan.loanId} />
             <Separator />
             <InfoRequests lender={lender} loanId={loan.loanId} />
@@ -297,6 +300,49 @@ function ProposeChange({ lender, loanId }: { lender: string; loanId: string }) {
         </Button>
       </form>
     </section>
+  );
+}
+
+/**
+ * What is open on this loan right now, first thing in the sheet, and only when there is
+ * something. It renders nothing otherwise — the same rule as the row badge: the engine
+ * reports what is open, it does not certify that all is well. Every line here already
+ * reached the driver first (module 2.8: call before you miss), so the officer can pick up
+ * the phone knowing the borrower has seen the same words.
+ */
+function Covenants({ lender, loanId }: { lender: string; loanId: string }) {
+  const covenants = useLenderLoanCovenants(lender, loanId);
+  const data = covenants.data;
+  if (!data || !data.worst || data.covenants.length === 0) return null;
+  const alert = data.worst === 'ALERT';
+
+  return (
+    <>
+      <section
+        role={alert ? 'alert' : 'status'}
+        className={`space-y-2 rounded-md border p-3 ${
+          alert ? 'border-destructive/50 bg-destructive/5' : 'border-amber-500/50 bg-amber-500/5'
+        }`}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-semibold">Open warnings</h3>
+          <CovenantBadge worst={data.worst} count={data.covenants.length} />
+        </div>
+        <ul className="space-y-1.5">
+          {data.covenants.map((c) => (
+            <li key={c.kind} className="text-sm">
+              <span className="font-medium">{c.severity === 'ALERT' ? 'Alert' : 'Warning'}:</span>{' '}
+              {c.message}
+            </li>
+          ))}
+        </ul>
+        <p className="text-xs text-muted-foreground">
+          The borrower saw each of these before you did. A call from you is a conversation, not
+          an escalation.
+        </p>
+      </section>
+      <Separator />
+    </>
   );
 }
 

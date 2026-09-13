@@ -10,6 +10,7 @@ import {
   getLenderApplications,
   getLenderBorrowers,
   getLenderDisbursements,
+  getLenderLoanCovenants,
   getLenderLoanDecisions,
   getLenderLoanInfoRequests,
   getLenderLoanInspections,
@@ -42,6 +43,8 @@ export const lenderKeys = {
     [...lenderKeys.all(lender), 'loan', loanId, 'inspections'] as const,
   loanSavings: (lender: string, loanId: string) =>
     [...lenderKeys.all(lender), 'loan', loanId, 'savings'] as const,
+  loanCovenants: (lender: string, loanId: string) =>
+    [...lenderKeys.all(lender), 'loan', loanId, 'covenants'] as const,
   loanTraining: (lender: string, loanId: string) =>
     [...lenderKeys.all(lender), 'loan', loanId, 'training'] as const,
   loanDecisions: (lender: string, loanId: string) =>
@@ -149,6 +152,15 @@ export function useLenderLoanTraining(lender: string, loanId: string) {
   return useQuery({
     queryKey: lenderKeys.loanTraining(lender, loanId),
     queryFn: () => getLenderLoanTraining(lender, loanId, token),
+    enabled: ready && !!loanId,
+  });
+}
+
+export function useLenderLoanCovenants(lender: string, loanId: string) {
+  const { token, ready } = useLenderAuth();
+  return useQuery({
+    queryKey: lenderKeys.loanCovenants(lender, loanId),
+    queryFn: () => getLenderLoanCovenants(lender, loanId, token),
     enabled: ready && !!loanId,
   });
 }
